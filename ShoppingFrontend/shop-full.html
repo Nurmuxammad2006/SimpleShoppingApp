@@ -1,0 +1,978 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <title>Shop Homepage - Demo Mode</title>
+    <link rel="icon" type="image/x-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><text x='0' y='14'>🛒</text></svg>" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <style>
+        /* =============================================
+           AUTH
+        ============================================= */
+        #auth-section { display: none; min-height: 100vh; flex-direction: column; }
+        #auth-section.active { display: flex; }
+
+        .auth-wrapper {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 3rem 1rem;
+            background-color: #f8f9fa;
+        }
+        .auth-card {
+            background: #fff;
+            border: 1px solid rgba(0,0,0,.125);
+            border-radius: .375rem;
+            padding: 2.5rem 2rem;
+            width: 100%;
+            max-width: 420px;
+            box-shadow: 0 .125rem .5rem rgba(0,0,0,.06);
+        }
+        .auth-card h2 { font-size: 1.35rem; font-weight: 700; margin-bottom: .25rem; color: #212529; }
+        .auth-card .subtitle { font-size: .875rem; color: #6c757d; margin-bottom: 1.75rem; }
+        .auth-card .form-control:focus { border-color: #212529; box-shadow: 0 0 0 .2rem rgba(33,37,41,.15); }
+        .auth-card .btn-dark { width: 100%; padding: .55rem; font-weight: 500; }
+        .auth-switch { font-size: .85rem; text-align: center; margin-top: 1.25rem; color: #6c757d; }
+        .auth-switch a { color: #212529; font-weight: 600; text-decoration: none; }
+        .auth-switch a:hover { text-decoration: underline; }
+        .feedback-msg { font-size: .8rem; margin-top: .35rem; }
+        .btn-spinner { display: none; }
+        .btn.loading .btn-spinner { display: inline-block; }
+        .btn.loading .btn-text { display: none; }
+        .auth-form { display: none; }
+        .auth-form.active { display: block; }
+
+        /* =============================================
+           SHOP
+        ============================================= */
+        #shop-section { display: none; }
+        #shop-section.active { display: block; }
+
+        /* Navbar user badge */
+        #guest-buttons { display: flex; }
+        #guest-buttons.hidden { display: none !important; }
+        #user-area { display: none; align-items: center; gap: .5rem; }
+        #user-area.visible { display: flex; }
+
+        /* Category filter pills */
+        .category-pills { display: flex; flex-wrap: wrap; gap: .5rem; margin-bottom: 1.5rem; }
+        .category-pill {
+            padding: .35rem 1rem;
+            border-radius: 50rem;
+            border: 1px solid #212529;
+            background: transparent;
+            color: #212529;
+            font-size: .85rem;
+            cursor: pointer;
+            transition: all .2s;
+        }
+        .category-pill:hover,
+        .category-pill.active { background: #212529; color: #fff; }
+
+        /* Product card skeleton loader */
+        .skeleton { background: #e9ecef; border-radius: .375rem; animation: pulse 1.5s ease-in-out infinite; }
+        .skeleton-img { height: 180px; width: 100%; }
+        .skeleton-line { height: 14px; margin: 8px 0; }
+        .skeleton-btn { height: 38px; width: 120px; margin: 0 auto; }
+        @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.5} }
+
+        /* Empty / error state */
+        .state-msg { text-align: center; padding: 3rem 1rem; color: #6c757d; }
+        .state-msg i { font-size: 2.5rem; display: block; margin-bottom: .75rem; }
+
+        /* Cart offcanvas tweaks */
+        .cart-item-img { width: 60px; height: 60px; object-fit: cover; border-radius: .25rem; background:#dee2e6; }
+        .cart-empty { text-align:center; padding: 3rem 1rem; color:#6c757d; }
+        .cart-empty i { font-size:2.5rem; display:block; margin-bottom:.5rem; }
+        
+        /* demo mode badge (subtle) */
+        .demo-badge {
+            position: fixed;
+            bottom: 1rem;
+            right: 1rem;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            font-size: 0.7rem;
+            padding: 0.25rem 0.75rem;
+            border-radius: 2rem;
+            backdrop-filter: blur(4px);
+            pointer-events: none;
+            z-index: 1050;
+            font-weight: 500;
+            letter-spacing: 0.3px;
+        }
+
+        /* Product Details Modal */
+        .product-detail-image {
+            width: 100%;
+            border-radius: 8px;
+            object-fit: cover;
+        }
+        .product-specs {
+            list-style: none;
+            padding: 0;
+        }
+        .product-specs li {
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #e9ecef;
+            display: flex;
+            justify-content: space-between;
+        }
+        .product-specs li strong {
+            color: #212529;
+        }
+        .quantity-selector {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            border: 1px solid #dee2e6;
+            border-radius: 0.375rem;
+            padding: 0.25rem;
+        }
+        .quantity-selector button {
+            background: none;
+            border: none;
+            width: 30px;
+            height: 30px;
+            border-radius: 0.25rem;
+            transition: all 0.2s;
+        }
+        .quantity-selector button:hover {
+            background: #f8f9fa;
+        }
+        .quantity-selector span {
+            min-width: 40px;
+            text-align: center;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+
+<!-- =============================================
+     SHARED NAVBAR
+============================================= -->
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container px-4 px-lg-5">
+        <a class="navbar-brand" href="#" onclick="goHome()">Start Bootstrap</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
+                aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-4">
+                <li class="nav-item"><a class="nav-link active" href="#" onclick="goHome()">Home</a></li>
+                <li class="nav-item"><a class="nav-link" href="#!">About</a></li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#"
+                       role="button" data-bs-toggle="dropdown" aria-expanded="false">Shop</a>
+                    <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <li><a class="dropdown-item" href="#" onclick="filterCategory('all')">All Products</a></li>
+                        <li><hr class="dropdown-divider" /></li>
+                        <li><a class="dropdown-item" href="#" onclick="filterCategory('popular')">Popular Items</a></li>
+                        <li><a class="dropdown-item" href="#" onclick="filterCategory('new')">New Arrivals</a></li>
+                    </ul>
+                </li>
+            </ul>
+
+            <!-- Guest -->
+            <div id="guest-buttons" class="d-flex gap-2">
+                <button class="btn btn-outline-dark" onclick="showAuth('login')">Login</button>
+                <button class="btn btn-dark" onclick="showAuth('register')">Sign Up</button>
+            </div>
+
+            <!-- Logged in -->
+            <div id="user-area">
+                <button class="btn btn-outline-dark" type="button"
+                        data-bs-toggle="offcanvas" data-bs-target="#cartOffcanvas">
+                    <i class="bi-cart-fill me-1"></i>
+                    Cart
+                    <span id="cart-count" class="badge bg-dark text-white ms-1 rounded-pill">0</span>
+                </button>
+                <span class="ms-2 text-muted" style="font-size:.85rem;">
+                    Hi, <strong id="nav-username"></strong>
+                </span>
+                <button class="btn btn-sm btn-outline-secondary ms-1" onclick="handleLogout()">Logout</button>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<!-- =============================================
+     AUTH SECTION
+============================================= -->
+<div id="auth-section">
+    <div class="auth-wrapper">
+
+        <!-- LOGIN -->
+        <div id="form-login" class="auth-form active">
+            <div class="auth-card">
+                <h2>Welcome back</h2>
+                <p class="subtitle">Sign in to your account to continue.</p>
+                <div id="login-alert"   class="alert alert-danger  py-2 d-none"></div>
+                <div id="login-success" class="alert alert-success py-2 d-none"></div>
+                <div class="mb-3">
+                    <label for="login-email" class="form-label">Email address</label>
+                    <input type="email" class="form-control" id="login-email" placeholder="you@example.com" autocomplete="email" />
+                    <div id="login-email-err" class="feedback-msg text-danger"></div>
+                </div>
+                <div class="mb-1">
+                    <label for="login-password" class="form-label">Password</label>
+                    <div class="input-group">
+                        <input type="password" class="form-control" id="login-password" placeholder="••••••••" autocomplete="current-password" />
+                        <button class="btn btn-outline-secondary" type="button" onclick="togglePassword('login-password',this)" tabindex="-1"><i class="bi bi-eye"></i></button>
+                    </div>
+                    <div id="login-pass-err" class="feedback-msg text-danger"></div>
+                </div>
+                <div class="text-end mb-3">
+                    <a href="#" class="text-muted" style="font-size:.82rem;" onclick="switchForm('forgot')">Forgot password?</a>
+                </div>
+                <button class="btn btn-dark" id="login-btn" onclick="handleLogin()">
+                    <span class="btn-text">Sign In</span>
+                    <span class="btn-spinner spinner-border spinner-border-sm" role="status"></span>
+                </button>
+                <div class="auth-switch">Don't have an account? <a href="#" onclick="switchForm('register')">Sign up</a></div>
+            </div>
+        </div>
+
+        <!-- REGISTER -->
+        <div id="form-register" class="auth-form">
+            <div class="auth-card">
+                <h2>Create account</h2>
+                <p class="subtitle">Join us — it only takes a minute.</p>
+                <div id="register-alert"   class="alert alert-danger  py-2 d-none"></div>
+                <div id="register-success" class="alert alert-success py-2 d-none"></div>
+                <div class="row g-2 mb-3">
+                    <div class="col-6">
+                        <label for="reg-firstname" class="form-label">First name</label>
+                        <input type="text" class="form-control" id="reg-firstname" placeholder="John" autocomplete="given-name" />
+                        <div id="reg-firstname-err" class="feedback-msg text-danger"></div>
+                    </div>
+                    <div class="col-6">
+                        <label for="reg-lastname" class="form-label">Last name</label>
+                        <input type="text" class="form-control" id="reg-lastname" placeholder="Doe" autocomplete="family-name" />
+                        <div id="reg-lastname-err" class="feedback-msg text-danger"></div>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label for="reg-email" class="form-label">Email address</label>
+                    <input type="email" class="form-control" id="reg-email" placeholder="you@example.com" autocomplete="email" />
+                    <div id="reg-email-err" class="feedback-msg text-danger"></div>
+                </div>
+                <div class="mb-3">
+                    <label for="reg-password" class="form-label">Password</label>
+                    <div class="input-group">
+                        <input type="password" class="form-control" id="reg-password" placeholder="Min. 8 characters" autocomplete="new-password" />
+                        <button class="btn btn-outline-secondary" type="button" onclick="togglePassword('reg-password',this)" tabindex="-1"><i class="bi bi-eye"></i></button>
+                    </div>
+                    <div id="reg-pass-err" class="feedback-msg text-danger"></div>
+                    <div class="progress mt-2" style="height:4px;">
+                        <div id="strength-bar" class="progress-bar" style="width:0%;transition:width .3s,background .3s;"></div>
+                    </div>
+                    <div id="strength-label" class="feedback-msg text-muted"></div>
+                </div>
+                <div class="mb-3">
+                    <label for="reg-confirm" class="form-label">Confirm password</label>
+                    <div class="input-group">
+                        <input type="password" class="form-control" id="reg-confirm" placeholder="Re-enter password" autocomplete="new-password" />
+                        <button class="btn btn-outline-secondary" type="button" onclick="togglePassword('reg-confirm',this)" tabindex="-1"><i class="bi bi-eye"></i></button>
+                    </div>
+                    <div id="reg-confirm-err" class="feedback-msg text-danger"></div>
+                </div>
+                <div class="form-check mb-3">
+                    <input class="form-check-input" type="checkbox" id="reg-terms" />
+                    <label class="form-check-label" for="reg-terms" style="font-size:.85rem;">
+                        I agree to the <a href="#!" class="text-dark fw-semibold">Terms of Service</a> and <a href="#!" class="text-dark fw-semibold">Privacy Policy</a>
+                    </label>
+                    <div id="reg-terms-err" class="feedback-msg text-danger"></div>
+                </div>
+                <button class="btn btn-dark" id="register-btn" onclick="handleRegister()">
+                    <span class="btn-text">Create Account</span>
+                    <span class="btn-spinner spinner-border spinner-border-sm" role="status"></span>
+                </button>
+                <div class="auth-switch">Already have an account? <a href="#" onclick="switchForm('login')">Sign in</a></div>
+            </div>
+        </div>
+
+        <!-- FORGOT PASSWORD -->
+        <div id="form-forgot" class="auth-form">
+            <div class="auth-card">
+                <h2>password</h2>
+                <p class="subtitle">Enter your email and we'll send you a reset link.</p>
+                <div id="forgot-alert"   class="alert alert-danger  py-2 d-none"></div>
+                <div id="forgot-success" class="alert alert-success py-2 d-none"></div>
+                <div class="mb-3">
+                    <label for="forgot-email" class="form-label">Email address</label>
+                    <input type="email" class="form-control" id="forgot-email" placeholder="you@example.com" autocomplete="email" />
+                    <div id="forgot-email-err" class="feedback-msg text-danger"></div>
+                </div>
+                <button class="btn btn-dark" id="forgot-btn" onclick="handleForgot()">
+                    <span class="btn-text">Send Reset Link</span>
+                    <span class="btn-spinner spinner-border spinner-border-sm" role="status"></span>
+                </button>
+                <div class="auth-switch">Remembered it? <a href="#" onclick="switchForm('login')">Back to sign in</a></div>
+            </div>
+        </div>
+
+    </div>
+    <footer class="py-5 bg-dark">
+        <div class="container"><p class="m-0 text-center text-white">Copyright &copy; Your Website 2023</p></div>
+    </footer>
+</div>
+
+<!-- =============================================
+     SHOP SECTION (with demo preload)
+============================================= -->
+<div id="shop-section">
+
+    <!-- Hero -->
+    <header class="bg-dark py-5">
+        <div class="container px-4 px-lg-5 my-5">
+            <div class="text-center text-white">
+                <h1 class="display-4 fw-bolder">Shop in style</h1>
+                <p class="lead fw-normal text-white-50 mb-0">Explore demo products — sign in to unlock full experience</p>
+            </div>
+        </div>
+    </header>
+
+    <!-- Products -->
+    <section class="py-5">
+        <div class="container px-4 px-lg-5 mt-5">
+
+            <!-- Category filter pills -->
+            <div id="category-pills" class="category-pills justify-content-center">
+                <!-- Filled from demo categories or backend -->
+            </div>
+
+            <!-- Product grid -->
+            <div id="product-grid" class="row gx-4 gx-lg-5 row-cols-2 row-cols-md-3 row-cols-xl-4 justify-content-center">
+                <!-- Demo cards will appear here before login -->
+            </div>
+
+        </div>
+    </section>
+
+    <footer class="py-5 bg-dark">
+        <div class="container"><p class="m-0 text-center text-white">Copyright &copy; Your Website 2023</p></div>
+    </footer>
+</div>
+
+<!-- =============================================
+     PRODUCT DETAILS MODAL
+============================================= -->
+<div class="modal fade" id="productDetailModal" tabindex="-1" aria-labelledby="productDetailModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header border-0">
+                <h5 class="modal-title fw-bold" id="productDetailModalLabel">Product Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <img id="modal-product-image" class="product-detail-image" src="" alt="Product image">
+                    </div>
+                    <div class="col-md-6">
+                        <h3 id="modal-product-name" class="fw-bold mb-2"></h3>
+                        <div id="modal-product-rating" class="mb-2"></div>
+                        <h4 id="modal-product-price" class="text-primary mb-3"></h4>
+                        <p id="modal-product-description" class="text-muted mb-3"></p>
+                        
+                        <div class="mb-3">
+                            <strong>Category:</strong> <span id="modal-product-category"></span>
+                        </div>
+                        
+                        <ul class="product-specs mb-3">
+                            <li><strong>Availability:</strong> <span id="modal-product-stock" class="text-success">In Stock</span></li>
+                            <li><strong>SKU:</strong> <span id="modal-product-sku"></span></li>
+                            <li><strong>Brand:</strong> <span id="modal-product-brand"></span></li>
+                            <li><strong>Material:</strong> <span id="modal-product-material"></span></li>
+                        </ul>
+                        
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="quantity-selector">
+                                <button onclick="decrementModalQuantity()">−</button>
+                                <span id="modal-quantity">1</span>
+                                <button onclick="incrementModalQuantity()">+</button>
+                            </div>
+                            <button class="btn btn-dark flex-grow-1" onclick="addToCartFromModal()">
+                                <i class="bi-cart-fill me-2"></i>Add to Cart
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- =============================================
+     CART OFFCANVAS
+============================================= -->
+<div class="offcanvas offcanvas-end" tabindex="-1" id="cartOffcanvas" aria-labelledby="cartOffcanvasLabel">
+    <div class="offcanvas-header border-bottom">
+        <h5 class="offcanvas-title fw-bold" id="cartOffcanvasLabel">
+            <i class="bi-cart-fill me-2"></i>Your Cart
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body d-flex flex-column p-0">
+
+        <!-- Cart items list -->
+        <div id="cart-items-list" class="flex-grow-1 overflow-auto p-3">
+            <!-- Filled dynamically -->
+        </div>
+
+        <!-- Cart footer -->
+        <div id="cart-footer" class="border-top p-3" style="display:none;">
+            <div class="d-flex justify-content-between fw-bold mb-3">
+                <span>Total</span>
+                <span id="cart-total">$0.00</span>
+            </div>
+            <button class="btn btn-dark w-100" onclick="handleCheckout()">
+                Proceed to Checkout
+            </button>
+        </div>
+
+    </div>
+</div>
+
+<!-- demo mode subtle badge -->
+<div class="demo-badge" id="demoBadge">✨ Demo Mode</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+
+/* ==============================================
+   CONFIG — change this to your backend URL
+=============================================== */
+const API_BASE = 'http://localhost:8080';  
+
+/* ==============================================
+   DEMO PRODUCTS (static showcase)
+   These will be shown before login and also as fallback if backend fails
+=============================================== */
+const DEMO_PRODUCTS = [
+    { id: 101, name: "Classic Denim Jacket", price: 89.99, image_url: "https://images.unsplash.com/photo-1576995853123-1dc2a1e4d6d9?w=400&h=300&fit=crop", badge: "Sale", rating: 5, categories: [1,2], price_min: null, price_max: null, description: "Premium quality denim jacket with classic fit. Perfect for casual wear. Features adjustable cuffs and multiple pockets.", sku: "DJ-001", brand: "Urban Style", material: "100% Cotton Denim", stock: 45 },
+    { id: 102, name: "Minimalist Watch", price: 129.00, image_url: "https://images.unsplash.com/photo-1524592094714-0f0654e20314?w=400&h=300&fit=crop", badge: null, rating: 4, categories: [2], price_min: null, price_max: null, description: "Elegant minimalist design watch with genuine leather strap. Water resistant up to 30m. Japanese quartz movement.", sku: "MW-002", brand: "Timeless", material: "Stainless Steel / Leather", stock: 28 },
+    { id: 103, name: "Leather Backpack", price_min: 79.00, price_max: 119.00, image_url: "https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=400&h=300&fit=crop", badge: "Limited", rating: null, categories: [1,3], price: null, description: "Handcrafted genuine leather backpack. Multiple compartments for laptop and daily essentials. Adjustable straps.", sku: "LB-003", brand: "Nomad Goods", material: "Full-grain Leather", stock: 15 },
+    { id: 104, name: "Wireless Headphones", price: 199.99, image_url: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400&h=300&fit=crop", badge: "New", rating: 5, categories: [3], price_min: null, price_max: null, description: "Premium noise-cancelling wireless headphones with 30-hour battery life. Hi-Fi sound quality with deep bass.", sku: "WH-004", brand: "AudioPro", material: "Memory Foam / ABS", stock: 62 },
+    { id: 105, name: "Slim Fit T-Shirt", price: 24.99, image_url: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=400&h=300&fit=crop", badge: null, rating: 4, categories: [1], price_min: null, price_max: null, description: "Comfortable cotton blend t-shirt with modern slim fit. Breathable fabric perfect for everyday wear.", sku: "TS-005", brand: "BasicWear", material: "95% Cotton, 5% Spandex", stock: 120 },
+    { id: 106, name: "Running Shoes", price_min: 85.00, price_max: 145.00, image_url: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400&h=300&fit=crop", badge: "Trending", rating: 5, categories: [2], price: null, description: "Lightweight running shoes with responsive cushioning. Breathable mesh upper for maximum airflow.", sku: "RS-006", brand: "RunFast", material: "Mesh / Rubber", stock: 34 },
+    { id: 107, name: "Stainless Steel Bottle", price: 19.95, image_url: "https://images.unsplash.com/photo-1602143407151-7111542de6e8?w=400&h=300&fit=crop", badge: "Eco", rating: 4, categories: [1,3], price_min: null, price_max: null, description: "Double-wall insulated bottle keeps drinks cold for 24h or hot for 12h. Eco-friendly and reusable.", sku: "SB-007", brand: "EcoLife", material: "18/8 Stainless Steel", stock: 89 },
+    { id: 108, name: "Smart Home Speaker", price: 149.00, image_url: "https://images.unsplash.com/photo-1589003077984-894e133dabab?w=400&h=300&fit=crop", badge: null, rating: null, categories: [3], price_min: null, price_max: null, description: "Voice-controlled smart speaker with built-in assistant. Premium sound quality and smart home integration.", sku: "SS-008", brand: "SmartTech", material: "Fabric / Plastic", stock: 41 }
+];
+
+const DEMO_CATEGORIES = [
+    { id: 1, name: "Popular Items" },
+    { id: 2, name: "New Arrivals" },
+    { id: 3, name: "Essentials" }
+];
+
+/* ==============================================
+   STATE
+=============================================== */
+let currentUser  = null;   
+let authToken    = null;   
+let cart         = [];     
+let allProducts  = [];     
+let activeCategory = 'all';
+let currentProduct = null;
+let modalQuantity = 1;
+
+/* ==============================================
+   API HELPER
+=============================================== */
+async function api(method, path, body = null) {
+    const headers = { 'Content-Type': 'application/json' };
+    if (authToken) headers['Authorization'] = `Bearer ${authToken}`;
+    const options = { method, headers };
+    if (body) options.body = JSON.stringify(body);
+    const response = await fetch(API_BASE + path, options);
+    const data = await response.json();
+    return { ok: response.ok, status: response.status, data };
+}
+
+/* ==============================================
+   SECTION SWITCHER
+=============================================== */
+function showSection(name) {
+    document.getElementById('auth-section').classList.remove('active');
+    document.getElementById('shop-section').classList.remove('active');
+    document.getElementById(name + '-section').classList.add('active');
+    window.scrollTo(0, 0);
+}
+
+function showAuth(formName) {
+    showSection('auth');
+    switchForm(formName);
+}
+
+function goHome() {
+    if (currentUser) {
+        showSection('shop');
+        loadShopDataForLoggedUser();
+    } else {
+        showSection('shop');
+        renderDemoProductsAndCategories();
+    }
+}
+
+function switchForm(name) {
+    document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active'));
+    document.getElementById('form-' + name).classList.add('active');
+    clearAllFeedback();
+    window.scrollTo(0, 0);
+}
+
+/* ==============================================
+   NAVBAR STATE
+=============================================== */
+function setLoggedIn(user, token) {
+    currentUser = user;
+    authToken   = token;
+    if (token) localStorage.setItem('token', token);
+    document.getElementById('guest-buttons').classList.add('hidden');
+    document.getElementById('nav-username').textContent = user.firstName || user.email;
+    document.getElementById('user-area').classList.add('visible');
+    const badge = document.getElementById('demoBadge');
+    if (badge) badge.style.opacity = '0.4';
+}
+
+function setLoggedOut() {
+    currentUser = null;
+    authToken   = null;
+    cart        = [];
+    localStorage.removeItem('token');
+    document.getElementById('guest-buttons').classList.remove('hidden');
+    document.getElementById('user-area').classList.remove('visible');
+    document.getElementById('nav-username').textContent = '';
+    updateCartUI();
+    const badge = document.getElementById('demoBadge');
+    if (badge) badge.style.opacity = '1';
+    if (document.getElementById('shop-section').classList.contains('active')) {
+        renderDemoProductsAndCategories();
+    }
+}
+
+async function handleLogout() {
+    setLoggedOut();
+    showAuth('login');
+}
+
+/* ==============================================
+   PRODUCT DETAIL MODAL FUNCTIONS
+=============================================== */
+function showProductDetails(product) {
+    currentProduct = product;
+    modalQuantity = 1;
+    
+    // Set modal content
+    document.getElementById('modal-product-image').src = product.image_url || 'https://dummyimage.com/450x300/dee2e6/6c757d.jpg';
+    document.getElementById('modal-product-name').textContent = product.name;
+    
+    // Rating stars
+    const ratingHtml = product.rating ? 
+        `<div class="d-flex text-warning">${'<div class="bi-star-fill"></div>'.repeat(Math.round(product.rating))}${'<div class="bi-star"></div>'.repeat(5-Math.round(product.rating))} <span class="ms-2 text-muted">(${product.rating}.0)</span></div>` : 
+        '<span class="text-muted">No ratings yet</span>';
+    document.getElementById('modal-product-rating').innerHTML = ratingHtml;
+    
+    // Price
+    let priceHtml = '';
+    if (product.price_min && product.price_max) {
+        priceHtml = `$${parseFloat(product.price_min).toFixed(2)} - $${parseFloat(product.price_max).toFixed(2)}`;
+    } else if (product.price) {
+        priceHtml = `$${parseFloat(product.price).toFixed(2)}`;
+    }
+    document.getElementById('modal-product-price').textContent = priceHtml;
+    
+    // Description (with fallback)
+    document.getElementById('modal-product-description').textContent = product.description || 'No description available for this product.';
+    
+    // Category
+    const categoryNames = product.categories ? product.categories.map(catId => {
+        const cat = DEMO_CATEGORIES.find(c => c.id === catId);
+        return cat ? cat.name : '';
+    }).filter(n => n).join(', ') : 'General';
+    document.getElementById('modal-product-category').textContent = categoryNames || 'General';
+    
+    // Additional specs
+    document.getElementById('modal-product-stock').innerHTML = (product.stock && product.stock > 0) ? `<span class="text-success">In Stock (${product.stock} available)</span>` : '<span class="text-danger">Out of Stock</span>';
+    document.getElementById('modal-product-sku').textContent = product.sku || `SKU-${product.id}`;
+    document.getElementById('modal-product-brand').textContent = product.brand || 'Generic Brand';
+    document.getElementById('modal-product-material').textContent = product.material || 'Standard Quality';
+    
+    document.getElementById('modal-quantity').textContent = modalQuantity;
+    
+    // Show modal
+    const modal = new bootstrap.Modal(document.getElementById('productDetailModal'));
+    modal.show();
+}
+
+function decrementModalQuantity() {
+    if (modalQuantity > 1) {
+        modalQuantity--;
+        document.getElementById('modal-quantity').textContent = modalQuantity;
+    }
+}
+
+function incrementModalQuantity() {
+    if (currentProduct && currentProduct.stock && modalQuantity < currentProduct.stock) {
+        modalQuantity++;
+        document.getElementById('modal-quantity').textContent = modalQuantity;
+    } else if (!currentProduct?.stock || modalQuantity < 99) {
+        modalQuantity++;
+        document.getElementById('modal-quantity').textContent = modalQuantity;
+    }
+}
+
+async function addToCartFromModal() {
+    if (!currentUser) {
+        bootstrap.Modal.getInstance(document.getElementById('productDetailModal')).hide();
+        showAuth('login');
+        return;
+    }
+    
+    // Add to cart multiple times based on quantity
+    for (let i = 0; i < modalQuantity; i++) {
+        await addToCart(currentProduct.id, false); // false means don't show modal again
+    }
+    
+    // Close product modal
+    bootstrap.Modal.getInstance(document.getElementById('productDetailModal')).hide();
+    
+    // Show cart offcanvas
+    const offcanvas = new bootstrap.Offcanvas(document.getElementById('cartOffcanvas'));
+    offcanvas.show();
+}
+
+/* ==============================================
+   DEMO RENDER (before login & fallback)
+=============================================== */
+function renderDemoProductsAndCategories() {
+    const container = document.getElementById('category-pills');
+    const allPills = [{ id: 'all', name: 'All Products' }, ...DEMO_CATEGORIES];
+    container.innerHTML = allPills.map(cat => `
+        <button class="category-pill ${cat.id === 'all' ? 'active' : ''}" data-id="${cat.id}" onclick="filterDemoCategory('${cat.id}')">
+            ${cat.name}
+        </button>
+    `).join('');
+    renderProducts(DEMO_PRODUCTS);
+}
+
+function filterDemoCategory(categoryId) {
+    activeCategory = categoryId;
+    document.querySelectorAll('.category-pill').forEach(pill => {
+        pill.classList.toggle('active', pill.dataset.id == categoryId);
+    });
+    if (categoryId === 'all') {
+        renderProducts(DEMO_PRODUCTS);
+    } else {
+        const filtered = DEMO_PRODUCTS.filter(p => p.categories && p.categories.includes(Number(categoryId)));
+        renderProducts(filtered);
+    }
+}
+
+window.filterCategory = function(categoryId) {
+    if (!currentUser) {
+        filterDemoCategory(categoryId);
+    } else {
+        activeCategory = categoryId;
+        document.querySelectorAll('.category-pill').forEach(pill => {
+            pill.classList.toggle('active', pill.dataset.id == categoryId);
+        });
+        if (categoryId === 'all') {
+            renderProducts(allProducts);
+        } else {
+            const filtered = allProducts.filter(p => p.categories && p.categories.includes(Number(categoryId)));
+            renderProducts(filtered);
+        }
+    }
+};
+
+/* ==============================================
+   AUTH HANDLERS
+=============================================== */
+function setError(id, msg) { const el = document.getElementById(id); if (el) el.textContent = msg; }
+function clearError(id) { setError(id, ''); }
+function showAlert(id, msg, type = 'danger') {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.textContent = msg;
+    el.className = `alert alert-${type} py-2`;
+}
+function hideAlert(id) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.className = 'alert alert-danger py-2 d-none';
+}
+function setLoading(btnId, state) {
+    const btn = document.getElementById(btnId);
+    if (!btn) return;
+    btn.disabled = state;
+    state ? btn.classList.add('loading') : btn.classList.remove('loading');
+}
+function clearAllFeedback() {
+    document.querySelectorAll('.feedback-msg').forEach(el => el.textContent = '');
+    ['login-alert','login-success','register-alert','register-success','forgot-alert','forgot-success'].forEach(hideAlert);
+}
+function togglePassword(inputId, btn) {
+    const input = document.getElementById(inputId);
+    const icon  = btn.querySelector('i');
+    if (input.type === 'password') { input.type = 'text'; icon.className = 'bi bi-eye-slash'; }
+    else { input.type = 'password'; icon.className = 'bi bi-eye'; }
+}
+function isValidEmail(email) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email); }
+
+document.getElementById('reg-password').addEventListener('input', function () {
+    const val = this.value;
+    let score = 0;
+    if (val.length >= 8) score++;
+    if (/[A-Z]/.test(val)) score++;
+    if (/[0-9]/.test(val)) score++;
+    if (/[^A-Za-z0-9]/.test(val)) score++;
+    const bar   = document.getElementById('strength-bar');
+    const label = document.getElementById('strength-label');
+    const levels = [{ pct:0,  color:'',        text:'' }, { pct:25, color:'#dc3545', text:'Weak' }, { pct:50, color:'#ffc107', text:'Fair' }, { pct:75, color:'#0d6efd', text:'Good' }, { pct:100,color:'#198754', text:'Strong' }];
+    const lvl = levels[score];
+    bar.style.width = lvl.pct + '%';
+    bar.style.backgroundColor = lvl.color;
+    label.textContent = val.length ? lvl.text : '';
+});
+
+async function handleLogin() {
+    hideAlert('login-alert'); hideAlert('login-success');
+    clearError('login-email-err'); clearError('login-pass-err');
+    const email    = document.getElementById('login-email').value.trim();
+    const password = document.getElementById('login-password').value;
+    let valid = true;
+    if (!email) { setError('login-email-err', 'Email is required.'); valid = false; }
+    else if (!isValidEmail(email)) { setError('login-email-err', 'Please enter a valid email.'); valid = false; }
+    if (!password) { setError('login-pass-err', 'Password is required.'); valid = false; }
+    if (!valid) return;
+    setLoading('login-btn', true);
+    try {
+        const { ok, data } = await api('POST', '/login', { email, password });
+        if (ok) {
+            const user  = data.user  || { id: data.id, firstName: data.firstName, email: data.email };
+            const token = data.token || 'temp-token';
+            setLoggedIn(user, token);
+            await loadShopDataForLoggedUser();
+            showSection('shop');
+        } else {
+            showAlert('login-alert', data.message || 'Invalid email or password.');
+        }
+    } catch (err) {
+        showAlert('login-alert', 'Invalid email or password.');
+    } finally {
+        setLoading('login-btn', false);
+    }
+}
+
+async function handleRegister() {
+    hideAlert('register-alert'); hideAlert('register-success');
+    ['reg-firstname-err','reg-lastname-err','reg-email-err','reg-pass-err','reg-confirm-err','reg-terms-err'].forEach(clearError);
+    const firstName = document.getElementById('reg-firstname').value.trim();
+    const lastName  = document.getElementById('reg-lastname').value.trim();
+    const email     = document.getElementById('reg-email').value.trim();
+    const password  = document.getElementById('reg-password').value;
+    const confirm   = document.getElementById('reg-confirm').value;
+    const terms     = document.getElementById('reg-terms').checked;
+    let valid = true;
+    if (!firstName) { setError('reg-firstname-err', 'First name is required.'); valid = false; }
+    if (!lastName)  { setError('reg-lastname-err',  'Last name is required.');  valid = false; }
+    if (!email) { setError('reg-email-err', 'Email is required.'); valid = false; }
+    else if (!isValidEmail(email)) { setError('reg-email-err', 'Please enter a valid email.'); valid = false; }
+    if (!password) { setError('reg-pass-err', 'Password is required.'); valid = false; }
+    else if (password.length < 8) { setError('reg-pass-err', 'Password must be at least 8 characters.'); valid = false; }
+    if (password !== confirm) { setError('reg-confirm-err', 'Passwords do not match.'); valid = false; }
+    if (!terms) { setError('reg-terms-err', 'You must accept the terms to continue.'); valid = false; }
+    if (!valid) return;
+    setLoading('register-btn', true);
+    try {
+        const { ok, data } = await api('POST', '/register', { firstName, lastName, email, password });
+        if (ok) {
+            const user  = data.user  || { id: data.id, firstName: data.firstName, email: data.email };
+            const token = data.token || 'temp-token';
+            setLoggedIn(user, token);
+            await loadShopDataForLoggedUser();
+            showSection('shop');
+        } else {
+            showAlert('register-alert', data.message || 'Account already exists or invalid data.');
+        }
+    } catch (err) {
+        showAlert('register-alert', 'Network error. Please try again.');
+    } finally {
+        setLoading('register-btn', false);
+    }
+}
+
+async function handleForgot() {
+    hideAlert('forgot-alert'); hideAlert('forgot-success');
+    clearError('forgot-email-err');
+    const email = document.getElementById('forgot-email').value.trim();
+    if (!email) { setError('forgot-email-err', 'Email is required.'); return; }
+    if (!isValidEmail(email)) { setError('forgot-email-err', 'Please enter a valid email.'); return; }
+    setLoading('forgot-btn', true);
+    try {
+        const { ok, data } = await api('POST', '/forgot-password', { email });
+        if (ok) {
+            showAlert('forgot-success', data.message || 'Reset link sent! Check your inbox.', 'success');
+            document.getElementById('forgot-email').value = '';
+        } else {
+            showAlert('forgot-alert', data.message || 'Something went wrong. Please try again.');
+        }
+    } catch {
+        showAlert('forgot-alert', 'Network error. Please try again.');
+    } finally {
+        setLoading('forgot-btn', false);
+    }
+}
+
+async function loadShopDataForLoggedUser() {
+    renderProductSkeletons();
+    try {
+        const { ok: catOk, data: cats } = await api('GET', '/api/categories');
+        if (catOk && Array.isArray(cats)) {
+            const container = document.getElementById('category-pills');
+            const allPills = [{ id: 'all', name: 'All Products' }, ...cats];
+            container.innerHTML = allPills.map(cat => `<button class="category-pill ${cat.id === 'all' ? 'active' : ''}" data-id="${cat.id}" onclick="filterCategory('${cat.id}')">${cat.name}</button>`).join('');
+        } else {
+            fallbackCategoryPills();
+        }
+        const { ok: prodOk, data: prods } = await api('GET', '/api/products');
+        if (prodOk && Array.isArray(prods)) {
+            allProducts = prods;
+            renderProducts(prods);
+        } else {
+            renderProducts(DEMO_PRODUCTS);
+        }
+        await loadCart();
+    } catch (e) {
+        fallbackCategoryPills();
+        renderProducts(DEMO_PRODUCTS);
+    }
+}
+
+function fallbackCategoryPills() {
+    const container = document.getElementById('category-pills');
+    const allPills = [{ id: 'all', name: 'All Products' }, ...DEMO_CATEGORIES];
+    container.innerHTML = allPills.map(cat => `<button class="category-pill ${cat.id === 'all' ? 'active' : ''}" data-id="${cat.id}" onclick="filterCategory('${cat.id}')">${cat.name}</button>`).join('');
+}
+
+function renderProductSkeletons() {
+    const grid = document.getElementById('product-grid');
+    grid.innerHTML = Array(8).fill(0).map(() => `<div class="col mb-5"><div class="card h-100"><div class="skeleton skeleton-img"></div><div class="card-body p-4"><div class="skeleton skeleton-line w-75 mx-auto"></div><div class="skeleton skeleton-line w-50 mx-auto mt-2"></div></div><div class="card-footer p-4 pt-0 border-top-0 bg-transparent"><div class="d-flex justify-content-center"><div class="skeleton skeleton-btn"></div></div></div></div></div>`).join('');
+}
+
+function renderProducts(products) {
+    const grid = document.getElementById('product-grid');
+    if (!products.length) {
+        grid.innerHTML = `<div class="col-12"><div class="state-msg"><i class="bi bi-box-seam"></i>No products found.</div></div>`;
+        return;
+    }
+    grid.innerHTML = products.map(p => {
+        let priceHtml = '';
+        if (p.price_min && p.price_max) priceHtml = `$${parseFloat(p.price_min).toFixed(2)} - $${parseFloat(p.price_max).toFixed(2)}`;
+        else if (p.price) priceHtml = `$${parseFloat(p.price).toFixed(2)}`;
+        const badgeHtml = p.badge ? `<div class="badge bg-dark text-white position-absolute" style="top:.5rem;right:.5rem">${p.badge}</div>` : '';
+        const starsHtml = p.rating ? `<div class="d-flex justify-content-center small text-warning mb-2">${'<div class="bi-star-fill"></div>'.repeat(Math.round(p.rating))}</div>` : '';
+        const btnHtml = `<button class="btn btn-outline-dark mt-auto" onclick="showProductDetails(${JSON.stringify(p).replace(/"/g, '&quot;')})">View Details</button>`;
+        return `<div class="col mb-5"><div class="card h-100">${badgeHtml}<img class="card-img-top" src="${p.image_url || 'https://dummyimage.com/450x300/dee2e6/6c757d.jpg'}" alt="${p.name}" onerror="this.src='https://dummyimage.com/450x300/dee2e6/6c757d.jpg'" /><div class="card-body p-4"><div class="text-center"><h5 class="fw-bolder">${p.name}</h5>${starsHtml}${priceHtml}</div></div><div class="card-footer p-4 pt-0 border-top-0 bg-transparent"><div class="text-center">${btnHtml}</div></div></div></div>`;
+    }).join('');
+}
+
+async function loadCart() {
+    try {
+        const { ok, data } = await api('GET', '/cart');
+        if (ok && Array.isArray(data)) { cart = data; updateCartUI(); }
+    } catch(e) {}
+}
+
+async function addToCart(productId, showOffcanvas = true) {
+    if (!currentUser) { showAuth('login'); return false; }
+    try {
+        const { ok, data } = await api('POST', '/cart', { productId, quantity: 1 });
+        if (ok) {
+            const existing = cart.find(item => item.product.id === productId);
+            if (existing) existing.quantity += 1;
+            else cart.push(data.cartItem);
+            updateCartUI();
+            if (showOffcanvas) {
+                new bootstrap.Offcanvas(document.getElementById('cartOffcanvas')).show();
+            }
+            return true;
+        } else {
+            alert(data.message || 'Could not add.');
+            return false;
+        }
+    } catch { 
+        alert('Network error'); 
+        return false;
+    }
+}
+
+async function updateQuantity(cartItemId, newQty) {
+    if (newQty < 1) { removeFromCart(cartItemId); return; }
+    try {
+        const { ok } = await api('PUT', `/api/cart/${cartItemId}`, { quantity: newQty });
+        if (ok) { const item = cart.find(i => i.id === cartItemId); if (item) item.quantity = newQty; updateCartUI(); }
+    } catch { alert('Error'); }
+}
+
+async function removeFromCart(cartItemId) {
+    try {
+        const { ok } = await api('DELETE', `/api/cart/${cartItemId}`);
+        if (ok) { cart = cart.filter(i => i.id !== cartItemId); updateCartUI(); }
+    } catch { alert('Error'); }
+}
+
+function updateCartUI() {
+    const totalItems = cart.reduce((sum, i) => sum + i.quantity, 0);
+    document.getElementById('cart-count').textContent = totalItems;
+    const list = document.getElementById('cart-items-list');
+    const footer = document.getElementById('cart-footer');
+    if (!cart.length) {
+        list.innerHTML = `<div class="cart-empty"><i class="bi bi-cart-x"></i>Your cart is empty.</div>`;
+        footer.style.display = 'none'; return;
+    }
+    let total = 0;
+    list.innerHTML = cart.map(item => {
+        const price = parseFloat(item.product.price) || 0;
+        const subtotal = price * item.quantity;
+        total += subtotal;
+        return `<div class="d-flex align-items-center gap-3 mb-3 pb-3 border-bottom"><img class="cart-item-img" src="${item.product.image_url || 'https://dummyimage.com/60x60/dee2e6/6c757d.jpg'}" /><div class="flex-grow-1"><div class="fw-semibold">${item.product.name}</div><div class="text-muted">$${price.toFixed(2)} each</div><div class="d-flex gap-2 mt-1"><button class="btn btn-sm btn-outline-secondary px-2 py-0" onclick="updateQuantity(${item.id}, ${item.quantity-1})">−</button><span>${item.quantity}</span><button class="btn btn-sm btn-outline-secondary px-2 py-0" onclick="updateQuantity(${item.id}, ${item.quantity+1})">+</button></div></div><div class="text-end"><div class="fw-bold">$${subtotal.toFixed(2)}</div><button class="btn btn-sm text-danger p-0 mt-1" onclick="removeFromCart(${item.id})"><i class="bi bi-trash"></i></button></div></div>`;
+    }).join('');
+    document.getElementById('cart-total').textContent = `$${total.toFixed(2)}`;
+    footer.style.display = 'block';
+}
+
+async function handleCheckout() {
+    try {
+        const { ok, data } = await api('POST', '/api/orders');
+        if (ok) { cart = []; updateCartUI(); bootstrap.Offcanvas.getInstance(document.getElementById('cartOffcanvas')).hide(); alert(`Order placed! ID: ${data.orderId}`); }
+        else alert('Checkout failed');
+    } catch { alert('Network error'); }
+}
+
+document.addEventListener('keydown', function (e) {
+    if (e.key !== 'Enter') return;
+    const active = document.querySelector('.auth-form.active');
+    if (!active) return;
+    if (active.id === 'form-login')    handleLogin();
+    if (active.id === 'form-register') handleRegister();
+    if (active.id === 'form-forgot')   handleForgot();
+});
+
+/* ==============================================
+   INIT — show shop immediately with demo cards
+=============================================== */
+showSection('shop');
+renderDemoProductsAndCategories();
+</script>
+</body>
+</html>
