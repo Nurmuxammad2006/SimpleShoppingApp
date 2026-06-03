@@ -1,5 +1,6 @@
 package org.practising.shopingbackend.controller;
 
+import jakarta.mail.MessagingException;
 import org.practising.shopingbackend.dto.ErrorResponse;
 import org.practising.shopingbackend.dto.ForgotPasswordRequest;
 import org.practising.shopingbackend.dto.Login;
@@ -13,6 +14,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.io.IOException;
 
 @RestController
 public class AuthController {
@@ -49,7 +52,7 @@ public class AuthController {
     }
 
     @PostMapping("/forgot-password")
-    public ResponseEntity<?> forgotPassword(@RequestBody ForgotPasswordRequest request) {
+    public ResponseEntity<?> forgotPassword(@RequestBody ForgotPasswordRequest request) throws MessagingException, IOException {
         return forgotPasswordService.sendEmail(request.getEmail());
     }
 }

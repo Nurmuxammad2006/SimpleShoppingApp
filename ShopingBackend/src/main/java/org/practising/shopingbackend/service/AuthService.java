@@ -51,4 +51,18 @@ public class AuthService {
     public List<AuthModel> findAll() {
         return authRepository.findAll();
     }
+
+
+    public String extractEmailFromToken(String token) {
+        return null;
+    }
+
+    public AuthModel getUserByEmail(String email) {
+        return authRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+    }
+
+    public AuthModel getUserById(Integer userId) {
+        return null;
+    }
 }

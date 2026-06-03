@@ -1,16 +1,21 @@
 package org.practising.shopingbackend.service;
 
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.MimeMessage;
 import org.practising.shopingbackend.model.AuthModel;
 import org.practising.shopingbackend.model.ForgotPasswordResetTokensModel;
 import org.practising.shopingbackend.repository.AuthRepository;
 import org.practising.shopingbackend.repository.ForgotPasswordResetTokenRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.Optional;
 
@@ -26,7 +31,7 @@ public class ForgotPasswordService {
     @Autowired
     private JavaMailSender mailSender;
 
-    public ResponseEntity<?> sendEmail(String email) {
+    public ResponseEntity<?> sendEmail(String email) throws MessagingException, IOException {
 
         Optional<AuthModel> user = authRepository.findByEmail(email);
 
@@ -38,13 +43,24 @@ public class ForgotPasswordService {
         ForgotPasswordResetTokensModel resetTokensModel = new ForgotPasswordResetTokensModel(user.get());
         forgotPasswordResetTokenRepository.save(resetTokensModel);
 
-        String resetLink = "http://localhost:8080/reset-password?token=" + resetTokensModel.getToken();
+        String resetLink = "http://127.0.0.1:5500/shop-full.html?token=" + resetTokensModel.getToken();
 
-        SimpleMailMessage message = new SimpleMailMessage();
-        message.setFrom("nurimuhammad7473@gmail.com");
-        message.setTo(email);
-        message.setSubject("Password Reset Request");
-        message.setText("Click the link to reset your password:\n" + resetLink + "\n\nExpires in 15 minutes.");
+        MimeMessage message = mailSender.createMimeMessage();
+
+        MimeMessageHelper wrappingMessage = new MimeMessageHelper(message, true, "UTF-8");
+
+
+        wrappingMessage.setFrom("nurimuhammad7473@gmail.com");
+        wrappingMessage.setTo(email);
+        wrappingMessage.setSubject("Password Reset Request");
+
+        ClassPathResource resource = new ClassPathResource("templates/emails/password-reset.html");
+        String html = new String(resource.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
+
+        html = html.replace("{{firstName}}", user.get().getFirstName());
+        html = html.replace("{{resetLink}}", resetLink);
+
+        wrappingMessage.setText(html, true);
 
         mailSender.send(message);
 

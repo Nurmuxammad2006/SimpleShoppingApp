@@ -144,4 +144,19 @@ public class ProductsModel {
     }
 
 
+    public Object getSku() {
+        return null;
+    }
+
+    public Object getBrand() {
+        return null;
+    }
+
+    public Object getMaterial() {
+        return null;
+    }
+
+    public Object getStock() {
+        return null;
+    }
 }
