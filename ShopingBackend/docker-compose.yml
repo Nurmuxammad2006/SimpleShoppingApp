@@ -1,0 +1,41 @@
+services:
+
+  postgres:
+    image: postgres:16
+    container_name: shopping-postgres
+    environment:
+      POSTGRES_DB: shopping
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: nikO_151622
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  backend:
+    build: .
+    container_name: shopping-backend
+
+    depends_on:
+      - postgres
+
+    ports:
+      - "8080:8080"
+
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/shopping
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: nikO_151622
+
+  frontend:
+    build:
+      context: /home/nurmuxammad/Documents/Shopping/ShoppingFrontend
+
+    container_name: shopping-frontend
+
+    depends_on:
+      - backend
+
+    ports:
+      - "3000:80"
+
+volumes:
+  postgres_data:
