@@ -27,11 +27,12 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
             cd ~/SimpleShoppingApp
-
-            git pull
-
+          
+            git fetch origin main
+            git reset --hard origin/main
+          
+            cd ShopingBackend
+          
             docker compose down
-
             docker compose pull
-
             docker compose up -d --build
