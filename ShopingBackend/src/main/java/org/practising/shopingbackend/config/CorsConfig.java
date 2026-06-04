@@ -14,12 +14,17 @@ public class CorsConfig {
     @Bean
     public CorsFilter corsFilter() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of("127.0.0.1:5500"));           // allow all origins
+        config.setAllowedOriginPatterns(List.of(
+                "http://13.49.228.2:3000",
+                "http://localhost:3000",
+                "http://localhost:5500",
+                "http://127.0.0.1:5500"
+        ));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        config.setAllowedHeaders(List.of("*"));           // allow all headers
+        config.setAllowedHeaders(List.of("*"));
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", config);  // apply to all endpoints
+        source.registerCorsConfiguration("/**", config);
 
         return new CorsFilter(source);
     }
