@@ -450,7 +450,7 @@
 /* ==============================================
    CONFIG — change this to your backend URL
 =============================================== */
-const API_BASE = 'http://localhost:8080';  
+const API_BASE = 'http://13.49.228.2:8080';  
 
 /* ==============================================
    DEMO PRODUCTS (static showcase)
@@ -844,7 +844,7 @@ async function loadShopDataForLoggedUser() {
         } else {
             fallbackCategoryPills();
         }
-        const { ok: prodOk, data: prods } = await api('GET', '/api/products');
+        const { ok: prodOk, data: prods } = await api('GET', '/cart');
         if (prodOk && Array.isArray(prods)) {
             allProducts = prods;
             renderProducts(prods);

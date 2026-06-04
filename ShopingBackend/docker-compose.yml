@@ -27,7 +27,7 @@ services:
 
   frontend:
     build:
-      context: /home/nurmuxammad/Documents/Shopping/ShoppingFrontend
+      context: ../ShoppingFrontend
 
     container_name: shopping-frontend
 
