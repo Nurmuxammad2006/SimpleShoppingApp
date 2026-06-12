@@ -2185,7 +2185,7 @@ const PAGE_LABELS = {
   'erp-invoices':    'ERP / Invoices',
   'crm-customers':   'CRM / Wholesale Customers',
   'crm-contacts':    'CRM / Records',
-  'wms-inventory':   'WMS / Inventory Items',
+  'wms-inventory':   'WMS / Remodule',
   'wms-dispatch':    'WMS / Dispatch List',
   'wms-categories':  'WMS / Stock Categories',
   'settings':        'Settings',
@@ -2608,8 +2608,8 @@ function renderDispatch() {
   document.getElementById('dispatch-count').textContent = dispatchList.length;
 
   if (!dispatchList.length) {
-    listEl.innerHTML = '<div class="empty-state"><div class="empty-state-icon">🚚</div><div class="empty-state-text">Dispatch list is empty</div><div class="empty-state-sub">Browse Inventory Items and click "Add to Dispatch"</div></div>';
     document.getElementById('dispatch-summary-rows').innerHTML = '';
+    listEl.innerHTML = '<div class="empty-state"><div class="empty-state-icon">🚚</div><div class="empty-state-text">Dispatch list is empty</div><div class="empty-state-sub">Browse Remodule and click "Add to Dispatch"</div></div>';
     document.getElementById('dispatch-total').textContent = '$0.00';
     return;
   }
