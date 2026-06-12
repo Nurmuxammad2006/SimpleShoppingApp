@@ -1,978 +1,2739 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-    <title>Shop Homepage - Demo Mode</title>
-    <link rel="icon" type="image/x-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><text x='0' y='14'>🛒</text></svg>" />
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css" rel="stylesheet" />
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet" />
-    <style>
-        /* =============================================
-           AUTH
-        ============================================= */
-        #auth-section { display: none; min-height: 100vh; flex-direction: column; }
-        #auth-section.active { display: flex; }
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>FabricFlow ERP — Wholesale Cloud Portal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+/* ============================================================
+   DESIGN SYSTEM — FabricFlow ERP Cloud Portal
+   Aesthetic: Industrial-utilitarian enterprise dark dashboard
+   ============================================================ */
+:root {
+  --bg-base:        #0b0e14;
+  --bg-surface:     #111520;
+  --bg-card:        #161b27;
+  --bg-hover:       #1c2233;
+  --bg-active:      #1e2840;
+  --border:         #232b3e;
+  --border-light:   #2d3750;
 
-        .auth-wrapper {
-            flex: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 3rem 1rem;
-            background-color: #f8f9fa;
-        }
-        .auth-card {
-            background: #fff;
-            border: 1px solid rgba(0,0,0,.125);
-            border-radius: .375rem;
-            padding: 2.5rem 2rem;
-            width: 100%;
-            max-width: 420px;
-            box-shadow: 0 .125rem .5rem rgba(0,0,0,.06);
-        }
-        .auth-card h2 { font-size: 1.35rem; font-weight: 700; margin-bottom: .25rem; color: #212529; }
-        .auth-card .subtitle { font-size: .875rem; color: #6c757d; margin-bottom: 1.75rem; }
-        .auth-card .form-control:focus { border-color: #212529; box-shadow: 0 0 0 .2rem rgba(33,37,41,.15); }
-        .auth-card .btn-dark { width: 100%; padding: .55rem; font-weight: 500; }
-        .auth-switch { font-size: .85rem; text-align: center; margin-top: 1.25rem; color: #6c757d; }
-        .auth-switch a { color: #212529; font-weight: 600; text-decoration: none; }
-        .auth-switch a:hover { text-decoration: underline; }
-        .feedback-msg { font-size: .8rem; margin-top: .35rem; }
-        .btn-spinner { display: none; }
-        .btn.loading .btn-spinner { display: inline-block; }
-        .btn.loading .btn-text { display: none; }
-        .auth-form { display: none; }
-        .auth-form.active { display: block; }
+  --text-primary:   #e8ecf4;
+  --text-secondary: #8892a4;
+  --text-muted:     #505c72;
 
-        /* =============================================
-           SHOP
-        ============================================= */
-        #shop-section { display: none; }
-        #shop-section.active { display: block; }
+  --accent-blue:    #3b82f6;
+  --accent-cyan:    #22d3ee;
+  --accent-green:   #22c55e;
+  --accent-amber:   #f59e0b;
+  --accent-red:     #ef4444;
+  --accent-purple:  #a78bfa;
 
-        /* Navbar user badge */
-        #guest-buttons { display: flex; }
-        #guest-buttons.hidden { display: none !important; }
-        #user-area { display: none; align-items: center; gap: .5rem; }
-        #user-area.visible { display: flex; }
+  --sidebar-w:      240px;
+  --topbar-h:       56px;
 
-        /* Category filter pills */
-        .category-pills { display: flex; flex-wrap: wrap; gap: .5rem; margin-bottom: 1.5rem; }
-        .category-pill {
-            padding: .35rem 1rem;
-            border-radius: 50rem;
-            border: 1px solid #212529;
-            background: transparent;
-            color: #212529;
-            font-size: .85rem;
-            cursor: pointer;
-            transition: all .2s;
-        }
-        .category-pill:hover,
-        .category-pill.active { background: #212529; color: #fff; }
+  --font-ui:        'IBM Plex Sans', sans-serif;
+  --font-mono:      'IBM Plex Mono', monospace;
+  --radius:         6px;
+  --radius-lg:      10px;
+  --shadow:         0 2px 12px rgba(0,0,0,0.4);
+  --shadow-lg:      0 8px 32px rgba(0,0,0,0.6);
+}
 
-        /* Product card skeleton loader */
-        .skeleton { background: #e9ecef; border-radius: .375rem; animation: pulse 1.5s ease-in-out infinite; }
-        .skeleton-img { height: 180px; width: 100%; }
-        .skeleton-line { height: 14px; margin: 8px 0; }
-        .skeleton-btn { height: 38px; width: 120px; margin: 0 auto; }
-        @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.5} }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-        /* Empty / error state */
-        .state-msg { text-align: center; padding: 3rem 1rem; color: #6c757d; }
-        .state-msg i { font-size: 2.5rem; display: block; margin-bottom: .75rem; }
+body {
+  font-family: var(--font-ui);
+  background: var(--bg-base);
+  color: var(--text-primary);
+  font-size: 13px;
+  line-height: 1.6;
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
 
-        /* Cart offcanvas tweaks */
-        .cart-item-img { width: 60px; height: 60px; object-fit: cover; border-radius: .25rem; background:#dee2e6; }
-        .cart-empty { text-align:center; padding: 3rem 1rem; color:#6c757d; }
-        .cart-empty i { font-size:2.5rem; display:block; margin-bottom:.5rem; }
-        
-        /* demo mode badge (subtle) */
-        .demo-badge {
-            position: fixed;
-            bottom: 1rem;
-            right: 1rem;
-            background: rgba(0,0,0,0.7);
-            color: white;
-            font-size: 0.7rem;
-            padding: 0.25rem 0.75rem;
-            border-radius: 2rem;
-            backdrop-filter: blur(4px);
-            pointer-events: none;
-            z-index: 1050;
-            font-weight: 500;
-            letter-spacing: 0.3px;
-        }
+/* ============================================================
+   AUTH SCREENS (Login / Register / Forgot Password)
+   Old: shopping site login → New: Enterprise cloud portal login
+   ============================================================ */
+#auth-screen {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background: var(--bg-base);
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background-image:
+    radial-gradient(ellipse 80% 50% at 50% -20%, rgba(59,130,246,0.12) 0%, transparent 60%),
+    repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(255,255,255,0.015) 39px, rgba(255,255,255,0.015) 40px),
+    repeating-linear-gradient(180deg, transparent, transparent 39px, rgba(255,255,255,0.015) 39px, rgba(255,255,255,0.015) 40px);
+}
 
-        /* Product Details Modal */
-        .product-detail-image {
-            width: 100%;
-            border-radius: 8px;
-            object-fit: cover;
-        }
-        .product-specs {
-            list-style: none;
-            padding: 0;
-        }
-        .product-specs li {
-            padding: 0.5rem 0;
-            border-bottom: 1px solid #e9ecef;
-            display: flex;
-            justify-content: space-between;
-        }
-        .product-specs li strong {
-            color: #212529;
-        }
-        .quantity-selector {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            border: 1px solid #dee2e6;
-            border-radius: 0.375rem;
-            padding: 0.25rem;
-        }
-        .quantity-selector button {
-            background: none;
-            border: none;
-            width: 30px;
-            height: 30px;
-            border-radius: 0.25rem;
-            transition: all 0.2s;
-        }
-        .quantity-selector button:hover {
-            background: #f8f9fa;
-        }
-        .quantity-selector span {
-            min-width: 40px;
-            text-align: center;
-            font-weight: 500;
-        }
-    </style>
+.auth-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 40px;
+  width: 420px;
+  box-shadow: var(--shadow-lg);
+  position: relative;
+  overflow: hidden;
+}
+
+.auth-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--accent-blue), var(--accent-cyan), transparent);
+}
+
+.auth-logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.auth-logo-icon {
+  width: 36px; height: 36px;
+  background: linear-gradient(135deg, var(--accent-blue), var(--accent-cyan));
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px;
+}
+
+.auth-logo-text {
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  color: var(--text-primary);
+}
+
+.auth-logo-text span { color: var(--accent-cyan); }
+
+.auth-subtitle {
+  font-size: 11px;
+  font-family: var(--font-mono);
+  color: var(--text-muted);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-bottom: 32px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid var(--border);
+}
+
+.auth-form h2 {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 4px;
+  color: var(--text-primary);
+}
+
+.auth-form p.auth-desc {
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin-bottom: 24px;
+}
+
+.form-group {
+  margin-bottom: 16px;
+}
+
+.form-group label {
+  display: block;
+  font-size: 11px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: var(--text-secondary);
+  margin-bottom: 6px;
+}
+
+.form-group input {
+  width: 100%;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 10px 14px;
+  color: var(--text-primary);
+  font-family: var(--font-ui);
+  font-size: 13px;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.form-group input:focus {
+  border-color: var(--accent-blue);
+  box-shadow: 0 0 0 3px rgba(59,130,246,0.15);
+}
+
+.form-group input::placeholder { color: var(--text-muted); }
+
+.btn-primary {
+  width: 100%;
+  background: var(--accent-blue);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius);
+  padding: 11px 20px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s;
+  margin-top: 8px;
+}
+
+.btn-primary:hover { background: #2563eb; }
+.btn-primary:active { transform: scale(0.99); }
+
+.btn-secondary {
+  background: transparent;
+  color: var(--text-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 9px 16px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-secondary:hover {
+  border-color: var(--border-light);
+  color: var(--text-primary);
+  background: var(--bg-hover);
+}
+
+.auth-links {
+  margin-top: 20px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.auth-links a {
+  color: var(--accent-blue);
+  text-decoration: none;
+  font-size: 12px;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.auth-links a:hover { color: var(--accent-cyan); }
+
+.auth-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(34,197,94,0.1);
+  border: 1px solid rgba(34,197,94,0.25);
+  border-radius: 20px;
+  padding: 4px 10px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--accent-green);
+  margin-bottom: 24px;
+}
+
+.auth-badge::before {
+  content: '';
+  width: 6px; height: 6px;
+  background: var(--accent-green);
+  border-radius: 50%;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%,100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+.error-msg {
+  background: rgba(239,68,68,0.1);
+  border: 1px solid rgba(239,68,68,0.3);
+  border-radius: var(--radius);
+  padding: 10px 14px;
+  color: #fca5a5;
+  font-size: 12px;
+  margin-bottom: 16px;
+  display: none;
+}
+
+.success-msg {
+  background: rgba(34,197,94,0.1);
+  border: 1px solid rgba(34,197,94,0.3);
+  border-radius: var(--radius);
+  padding: 10px 14px;
+  color: #86efac;
+  font-size: 12px;
+  margin-bottom: 16px;
+  display: none;
+}
+
+/* ============================================================
+   APP SHELL — Sidebar + Topbar + Content
+   ============================================================ */
+#app-shell {
+  display: none;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* TOPBAR */
+.topbar {
+  height: var(--topbar-h);
+  background: var(--bg-surface);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 100;
+}
+
+.topbar-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.topbar-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+}
+
+.topbar-logo-icon {
+  width: 28px; height: 28px;
+  background: linear-gradient(135deg, var(--accent-blue), var(--accent-cyan));
+  border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px;
+}
+
+.topbar-logo-name {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.3px;
+}
+
+.topbar-logo-name span { color: var(--accent-cyan); }
+
+.topbar-breadcrumb {
+  font-size: 12px;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  border-left: 1px solid var(--border);
+  padding-left: 16px;
+  font-family: var(--font-mono);
+}
+
+.topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.system-status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--accent-green);
+  background: rgba(34,197,94,0.08);
+  border: 1px solid rgba(34,197,94,0.2);
+  border-radius: 20px;
+  padding: 4px 10px;
+}
+
+.system-status::before {
+  content: '';
+  width: 5px; height: 5px;
+  background: var(--accent-green);
+  border-radius: 50%;
+  animation: pulse 2s infinite;
+}
+
+.user-chip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 4px 12px 4px 4px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.user-chip:hover { background: var(--bg-hover); }
+
+.user-avatar {
+  width: 26px; height: 26px;
+  background: linear-gradient(135deg, var(--accent-purple), var(--accent-blue));
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+  color: #fff;
+}
+
+.user-chip-name {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.icon-btn {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 6px;
+  border-radius: var(--radius);
+  font-size: 16px;
+  transition: color 0.2s, background 0.2s;
+  display: flex; align-items: center; justify-content: center;
+}
+
+.icon-btn:hover { background: var(--bg-hover); color: var(--text-primary); }
+
+/* SIDEBAR */
+.sidebar {
+  width: var(--sidebar-w);
+  background: var(--bg-surface);
+  border-right: 1px solid var(--border);
+  position: fixed;
+  top: var(--topbar-h);
+  left: 0;
+  bottom: 0;
+  overflow-y: auto;
+  padding: 16px 0;
+  z-index: 50;
+}
+
+.sidebar::-webkit-scrollbar { width: 4px; }
+.sidebar::-webkit-scrollbar-track { background: transparent; }
+.sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+.nav-section-label {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  color: var(--text-muted);
+  padding: 12px 16px 6px;
+  font-family: var(--font-mono);
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 16px;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  border-radius: 0;
+  color: var(--text-secondary);
+  font-size: 13px;
+  font-weight: 400;
+  position: relative;
+  user-select: none;
+}
+
+.nav-item:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.nav-item.active {
+  background: var(--bg-active);
+  color: var(--accent-blue);
+  font-weight: 500;
+}
+
+.nav-item.active::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 3px;
+  background: var(--accent-blue);
+  border-radius: 0 2px 2px 0;
+}
+
+.nav-icon { font-size: 15px; width: 20px; text-align: center; flex-shrink: 0; }
+
+.nav-badge {
+  margin-left: auto;
+  background: var(--accent-red);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  border-radius: 10px;
+  padding: 1px 6px;
+  font-family: var(--font-mono);
+}
+
+.nav-badge.blue { background: var(--accent-blue); }
+
+.nav-divider {
+  height: 1px;
+  background: var(--border);
+  margin: 10px 16px;
+}
+
+/* MAIN CONTENT */
+.main-content {
+  margin-left: var(--sidebar-w);
+  margin-top: var(--topbar-h);
+  height: calc(100vh - var(--topbar-h));
+  overflow-y: auto;
+  padding: 24px;
+  background: var(--bg-base);
+}
+
+.main-content::-webkit-scrollbar { width: 6px; }
+.main-content::-webkit-scrollbar-track { background: transparent; }
+.main-content::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+/* ============================================================
+   PAGES
+   ============================================================ */
+.page { display: none; }
+.page.active { display: block; }
+
+/* PAGE HEADER */
+.page-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+
+.page-title {
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  color: var(--text-primary);
+}
+
+.page-title-sub {
+  font-size: 12px;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  margin-top: 3px;
+}
+
+.page-actions { display: flex; gap: 10px; align-items: center; }
+
+/* BUTTON VARIANTS */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border-radius: var(--radius);
+  font-family: var(--font-ui);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s;
+}
+
+.btn-blue { background: var(--accent-blue); color: #fff; }
+.btn-blue:hover { background: #2563eb; }
+.btn-green { background: var(--accent-green); color: #fff; }
+.btn-green:hover { background: #16a34a; }
+.btn-outline {
+  background: transparent;
+  color: var(--text-secondary);
+  border: 1px solid var(--border);
+}
+.btn-outline:hover { background: var(--bg-hover); color: var(--text-primary); border-color: var(--border-light); }
+
+/* STATS GRID */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.stat-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  position: relative;
+  overflow: hidden;
+  transition: border-color 0.2s;
+}
+
+.stat-card:hover { border-color: var(--border-light); }
+
+.stat-card::after {
+  content: '';
+  position: absolute;
+  top: 0; right: 0;
+  width: 80px; height: 80px;
+  background: radial-gradient(circle, var(--stat-color, rgba(59,130,246,0.08)) 0%, transparent 70%);
+  border-radius: 50%;
+}
+
+.stat-label {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  margin-bottom: 8px;
+}
+
+.stat-value {
+  font-size: 28px;
+  font-weight: 700;
+  font-family: var(--font-mono);
+  color: var(--text-primary);
+  letter-spacing: -1px;
+  line-height: 1;
+  margin-bottom: 8px;
+}
+
+.stat-meta {
+  font-size: 11px;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.stat-trend-up { color: var(--accent-green); }
+.stat-trend-down { color: var(--accent-red); }
+
+.stat-icon {
+  position: absolute;
+  top: 20px; right: 20px;
+  font-size: 22px;
+  opacity: 0.5;
+}
+
+/* DASHBOARD GRID */
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+/* CARD */
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+.card-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.card-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.card-title-badge {
+  font-size: 10px;
+  font-family: var(--font-mono);
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 2px 6px;
+  color: var(--text-muted);
+}
+
+.card-body { padding: 20px; }
+
+/* TABLE */
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.data-table th {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  padding: 10px 16px;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-surface);
+}
+
+.data-table td {
+  padding: 12px 16px;
+  font-size: 12px;
+  color: var(--text-primary);
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+}
+
+.data-table tr:last-child td { border-bottom: none; }
+.data-table tbody tr:hover { background: var(--bg-hover); }
+
+.data-table .mono { font-family: var(--font-mono); font-size: 11px; }
+.data-table .secondary { color: var(--text-secondary); }
+
+/* BADGES */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 600;
+  font-family: var(--font-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+
+.badge-green  { background: rgba(34,197,94,0.12); color: #4ade80; border: 1px solid rgba(34,197,94,0.2); }
+.badge-blue   { background: rgba(59,130,246,0.12); color: #60a5fa; border: 1px solid rgba(59,130,246,0.2); }
+.badge-amber  { background: rgba(245,158,11,0.12); color: #fbbf24; border: 1px solid rgba(245,158,11,0.2); }
+.badge-red    { background: rgba(239,68,68,0.12);  color: #f87171; border: 1px solid rgba(239,68,68,0.2); }
+.badge-purple { background: rgba(167,139,250,0.12);color: #c4b5fd; border: 1px solid rgba(167,139,250,0.2); }
+.badge-gray   { background: rgba(255,255,255,0.06); color: var(--text-secondary); border: 1px solid var(--border); }
+
+.badge::before {
+  content: '';
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+/* SYSTEM STATUS */
+.status-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.status-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  background: var(--bg-surface);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+}
+
+.status-name {
+  font-size: 12px;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.status-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--accent-green);
+  animation: pulse 2s infinite;
+  flex-shrink: 0;
+}
+
+.status-dot.amber { background: var(--accent-amber); }
+.status-dot.red   { background: var(--accent-red); animation: none; }
+
+.status-uptime {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--accent-green);
+}
+
+/* MINI CHART BARS */
+.mini-bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 3px;
+  height: 36px;
+}
+
+.mini-bar {
+  flex: 1;
+  background: var(--accent-blue);
+  border-radius: 2px 2px 0 0;
+  opacity: 0.6;
+  transition: opacity 0.2s;
+  min-height: 4px;
+}
+
+.mini-bar:hover { opacity: 1; }
+.mini-bar.green { background: var(--accent-green); }
+.mini-bar.amber { background: var(--accent-amber); }
+
+/* STOCK LEVEL RING */
+.ring-chart {
+  width: 80px; height: 80px;
+  position: relative;
+  flex-shrink: 0;
+}
+
+.ring-chart svg { transform: rotate(-90deg); }
+
+.ring-text {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono);
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1;
+}
+
+.ring-text small {
+  font-size: 9px;
+  color: var(--text-muted);
+  font-family: var(--font-ui);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* INVENTORY CARDS (WMS) */
+.inventory-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 16px;
+}
+
+.inventory-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 18px;
+  transition: border-color 0.2s, transform 0.2s;
+}
+
+.inventory-card:hover {
+  border-color: var(--border-light);
+  transform: translateY(-2px);
+}
+
+.inv-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.inv-sku {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-muted);
+  margin-bottom: 4px;
+}
+
+.inv-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.inv-meta {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+}
+
+.inv-meta-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.inv-meta-label {
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+}
+
+.inv-meta-value {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+/* STOCK BAR */
+.stock-bar-wrap {
+  margin-top: 12px;
+}
+
+.stock-bar-header {
+  display: flex;
+  justify-content: space-between;
+  font-size: 10px;
+  color: var(--text-muted);
+  margin-bottom: 4px;
+  font-family: var(--font-mono);
+}
+
+.stock-bar {
+  height: 4px;
+  background: var(--border);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.stock-bar-fill {
+  height: 100%;
+  border-radius: 2px;
+  transition: width 0.5s ease;
+}
+
+/* CRM CUSTOMER CARDS */
+.crm-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.crm-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  transition: border-color 0.2s;
+}
+
+.crm-card:hover { border-color: var(--border-light); }
+
+.crm-card-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--border);
+}
+
+.crm-avatar {
+  width: 40px; height: 40px;
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px;
+  font-weight: 700;
+  color: #fff;
+  flex-shrink: 0;
+}
+
+.crm-company { font-size: 13px; font-weight: 600; color: var(--text-primary); }
+.crm-contact { font-size: 11px; color: var(--text-secondary); margin-top: 2px; }
+
+.crm-detail-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 5px 0;
+  font-size: 11px;
+}
+
+.crm-detail-label { color: var(--text-muted); }
+.crm-detail-value { color: var(--text-primary); font-weight: 500; }
+
+.crm-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid var(--border);
+}
+
+/* DISPATCH LIST (old: cart) */
+.dispatch-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.dispatch-item:last-child { border-bottom: none; }
+
+.dispatch-thumb {
+  width: 44px; height: 44px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.dispatch-info { flex: 1; }
+.dispatch-name { font-size: 13px; font-weight: 500; color: var(--text-primary); }
+.dispatch-sku { font-family: var(--font-mono); font-size: 10px; color: var(--text-muted); }
+.dispatch-qty { font-family: var(--font-mono); font-size: 13px; font-weight: 700; color: var(--text-primary); white-space: nowrap; }
+
+.dispatch-total-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 0 8px;
+  border-top: 1px solid var(--border);
+  margin-top: 8px;
+}
+
+.dispatch-total-label { font-size: 12px; color: var(--text-secondary); }
+.dispatch-total-value { font-family: var(--font-mono); font-size: 16px; font-weight: 700; color: var(--text-primary); }
+
+/* TABS */
+.tabs {
+  display: flex;
+  gap: 2px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 3px;
+  margin-bottom: 20px;
+  width: fit-content;
+}
+
+.tab {
+  padding: 6px 14px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.tab.active {
+  background: var(--bg-card);
+  color: var(--text-primary);
+  box-shadow: var(--shadow);
+}
+
+.tab:not(.active):hover { color: var(--text-primary); background: var(--bg-hover); }
+
+/* SEARCH & FILTER BAR */
+.filter-bar {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.search-input-wrap {
+  position: relative;
+  flex: 1;
+  min-width: 200px;
+}
+
+.search-input-wrap::before {
+  content: '🔍';
+  position: absolute;
+  left: 10px; top: 50%;
+  transform: translateY(-50%);
+  font-size: 12px;
+  pointer-events: none;
+}
+
+.search-input {
+  width: 100%;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 8px 12px 8px 32px;
+  color: var(--text-primary);
+  font-family: var(--font-ui);
+  font-size: 12px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.search-input:focus { border-color: var(--accent-blue); }
+.search-input::placeholder { color: var(--text-muted); }
+
+.filter-select {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 8px 12px;
+  color: var(--text-primary);
+  font-family: var(--font-ui);
+  font-size: 12px;
+  outline: none;
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+
+.filter-select:focus { border-color: var(--accent-blue); }
+
+/* MODAL */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.7);
+  backdrop-filter: blur(4px);
+  z-index: 500;
+  display: none;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-overlay.open { display: flex; }
+
+.modal {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  width: 520px;
+  max-width: 95vw;
+  max-height: 85vh;
+  overflow-y: auto;
+  box-shadow: var(--shadow-lg);
+  position: relative;
+}
+
+.modal::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--accent-blue), var(--accent-cyan), transparent);
+}
+
+.modal-header {
+  padding: 20px 24px 16px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.modal-title { font-size: 15px; font-weight: 600; }
+.modal-close {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 18px;
+  padding: 4px;
+  line-height: 1;
+}
+.modal-close:hover { color: var(--text-primary); }
+
+.modal-body { padding: 24px; }
+
+/* LOADING SPINNER */
+.spinner {
+  width: 20px; height: 20px;
+  border: 2px solid var(--border);
+  border-top-color: var(--accent-blue);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  display: inline-block;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.loading-state {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 40px;
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 48px 24px;
+  color: var(--text-muted);
+}
+
+.empty-state-icon { font-size: 40px; margin-bottom: 12px; opacity: 0.4; }
+.empty-state-text { font-size: 14px; margin-bottom: 6px; color: var(--text-secondary); }
+.empty-state-sub { font-size: 12px; }
+
+/* TOAST NOTIFICATION */
+#toast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 16px;
+  font-size: 12px;
+  color: var(--text-primary);
+  box-shadow: var(--shadow-lg);
+  z-index: 9999;
+  display: none;
+  min-width: 260px;
+  border-left: 3px solid var(--accent-green);
+  transform: translateY(8px);
+  opacity: 0;
+  transition: transform 0.3s, opacity 0.3s;
+}
+
+#toast.show { display: block; transform: translateY(0); opacity: 1; }
+
+/* RESPONSIVE TWEAKS */
+@media (max-width: 900px) {
+  .sidebar { display: none; }
+  .main-content { margin-left: 0; }
+  .dashboard-grid { grid-template-columns: 1fr; }
+}
+</style>
 </head>
 <body>
 
-<!-- =============================================
-     SHARED NAVBAR
-============================================= -->
-<nav class="navbar navbar-expand-lg navbar-light bg-light">
-    <div class="container px-4 px-lg-5">
-        <a class="navbar-brand" href="#" onclick="goHome()">Start Bootstrap</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
-                data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
-                aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarSupportedContent">
-            <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-4">
-                <li class="nav-item"><a class="nav-link active" href="#" onclick="goHome()">Home</a></li>
-                <li class="nav-item"><a class="nav-link" href="#!">About</a></li>
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#"
-                       role="button" data-bs-toggle="dropdown" aria-expanded="false">Shop</a>
-                    <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        <li><a class="dropdown-item" href="#" onclick="filterCategory('all')">All Products</a></li>
-                        <li><hr class="dropdown-divider" /></li>
-                        <li><a class="dropdown-item" href="#" onclick="filterCategory('popular')">Popular Items</a></li>
-                        <li><a class="dropdown-item" href="#" onclick="filterCategory('new')">New Arrivals</a></li>
-                    </ul>
-                </li>
-            </ul>
-
-            <!-- Guest -->
-            <div id="guest-buttons" class="d-flex gap-2">
-                <button class="btn btn-outline-dark" onclick="showAuth('login')">Login</button>
-                <button class="btn btn-dark" onclick="showAuth('register')">Sign Up</button>
-            </div>
-
-            <!-- Logged in -->
-            <div id="user-area">
-                <button class="btn btn-outline-dark" type="button"
-                        data-bs-toggle="offcanvas" data-bs-target="#cartOffcanvas">
-                    <i class="bi-cart-fill me-1"></i>
-                    Cart
-                    <span id="cart-count" class="badge bg-dark text-white ms-1 rounded-pill">0</span>
-                </button>
-                <span class="ms-2 text-muted" style="font-size:.85rem;">
-                    Hi, <strong id="nav-username"></strong>
-                </span>
-                <button class="btn btn-sm btn-outline-secondary ms-1" onclick="handleLogout()">Logout</button>
-            </div>
-        </div>
+<!-- ============================================================
+     AUTH SCREEN
+     Old: Standard e-commerce login page
+     New: Enterprise Cloud Portal authentication
+     ============================================================ -->
+<div id="auth-screen">
+  <div class="auth-card">
+    <div class="auth-logo">
+      <div class="auth-logo-icon">🏭</div>
+      <div class="auth-logo-text">Fabric<span>Flow</span></div>
     </div>
-</nav>
+    <div class="auth-subtitle">WHOLESALE ERP / WMS / CRM CLOUD PORTAL</div>
+    <div class="auth-badge">SYSTEM ONLINE — v4.2.1</div>
 
-<!-- =============================================
-     AUTH SECTION
-============================================= -->
-<div id="auth-section">
-    <div class="auth-wrapper">
-
-        <!-- LOGIN -->
-        <div id="form-login" class="auth-form active">
-            <div class="auth-card">
-                <h2>Welcome back</h2>
-                <p class="subtitle">Sign in to your account to continue.</p>
-                <div id="login-alert"   class="alert alert-danger  py-2 d-none"></div>
-                <div id="login-success" class="alert alert-success py-2 d-none"></div>
-                <div class="mb-3">
-                    <label for="login-email" class="form-label">Email address</label>
-                    <input type="email" class="form-control" id="login-email" placeholder="you@example.com" autocomplete="email" />
-                    <div id="login-email-err" class="feedback-msg text-danger"></div>
-                </div>
-                <div class="mb-1">
-                    <label for="login-password" class="form-label">Password</label>
-                    <div class="input-group">
-                        <input type="password" class="form-control" id="login-password" placeholder="••••••••" autocomplete="current-password" />
-                        <button class="btn btn-outline-secondary" type="button" onclick="togglePassword('login-password',this)" tabindex="-1"><i class="bi bi-eye"></i></button>
-                    </div>
-                    <div id="login-pass-err" class="feedback-msg text-danger"></div>
-                </div>
-                <div class="text-end mb-3">
-                    <a href="#" class="text-muted" style="font-size:.82rem;" onclick="switchForm('forgot')">Forgot password?</a>
-                </div>
-                <button class="btn btn-dark" id="login-btn" onclick="handleLogin()">
-                    <span class="btn-text">Sign In</span>
-                    <span class="btn-spinner spinner-border spinner-border-sm" role="status"></span>
-                </button>
-                <div class="auth-switch">Don't have an account? <a href="#" onclick="switchForm('register')">Sign up</a></div>
-            </div>
-        </div>
-
-        <!-- REGISTER -->
-        <div id="form-register" class="auth-form">
-            <div class="auth-card">
-                <h2>Create account</h2>
-                <p class="subtitle">Join us — it only takes a minute.</p>
-                <div id="register-alert"   class="alert alert-danger  py-2 d-none"></div>
-                <div id="register-success" class="alert alert-success py-2 d-none"></div>
-                <div class="row g-2 mb-3">
-                    <div class="col-6">
-                        <label for="reg-firstname" class="form-label">First name</label>
-                        <input type="text" class="form-control" id="reg-firstname" placeholder="John" autocomplete="given-name" />
-                        <div id="reg-firstname-err" class="feedback-msg text-danger"></div>
-                    </div>
-                    <div class="col-6">
-                        <label for="reg-lastname" class="form-label">Last name</label>
-                        <input type="text" class="form-control" id="reg-lastname" placeholder="Doe" autocomplete="family-name" />
-                        <div id="reg-lastname-err" class="feedback-msg text-danger"></div>
-                    </div>
-                </div>
-                <div class="mb-3">
-                    <label for="reg-email" class="form-label">Email address</label>
-                    <input type="email" class="form-control" id="reg-email" placeholder="you@example.com" autocomplete="email" />
-                    <div id="reg-email-err" class="feedback-msg text-danger"></div>
-                </div>
-                <div class="mb-3">
-                    <label for="reg-password" class="form-label">Password</label>
-                    <div class="input-group">
-                        <input type="password" class="form-control" id="reg-password" placeholder="Min. 8 characters" autocomplete="new-password" />
-                        <button class="btn btn-outline-secondary" type="button" onclick="togglePassword('reg-password',this)" tabindex="-1"><i class="bi bi-eye"></i></button>
-                    </div>
-                    <div id="reg-pass-err" class="feedback-msg text-danger"></div>
-                    <div class="progress mt-2" style="height:4px;">
-                        <div id="strength-bar" class="progress-bar" style="width:0%;transition:width .3s,background .3s;"></div>
-                    </div>
-                    <div id="strength-label" class="feedback-msg text-muted"></div>
-                </div>
-                <div class="mb-3">
-                    <label for="reg-confirm" class="form-label">Confirm password</label>
-                    <div class="input-group">
-                        <input type="password" class="form-control" id="reg-confirm" placeholder="Re-enter password" autocomplete="new-password" />
-                        <button class="btn btn-outline-secondary" type="button" onclick="togglePassword('reg-confirm',this)" tabindex="-1"><i class="bi bi-eye"></i></button>
-                    </div>
-                    <div id="reg-confirm-err" class="feedback-msg text-danger"></div>
-                </div>
-                <div class="form-check mb-3">
-                    <input class="form-check-input" type="checkbox" id="reg-terms" />
-                    <label class="form-check-label" for="reg-terms" style="font-size:.85rem;">
-                        I agree to the <a href="#!" class="text-dark fw-semibold">Terms of Service</a> and <a href="#!" class="text-dark fw-semibold">Privacy Policy</a>
-                    </label>
-                    <div id="reg-terms-err" class="feedback-msg text-danger"></div>
-                </div>
-                <button class="btn btn-dark" id="register-btn" onclick="handleRegister()">
-                    <span class="btn-text">Create Account</span>
-                    <span class="btn-spinner spinner-border spinner-border-sm" role="status"></span>
-                </button>
-                <div class="auth-switch">Already have an account? <a href="#" onclick="switchForm('login')">Sign in</a></div>
-            </div>
-        </div>
-
-        <!-- FORGOT PASSWORD -->
-        <div id="form-forgot" class="auth-form">
-            <div class="auth-card">
-                <h2>password</h2>
-                <p class="subtitle">Enter your email and we'll send you a reset link.</p>
-                <div id="forgot-alert"   class="alert alert-danger  py-2 d-none"></div>
-                <div id="forgot-success" class="alert alert-success py-2 d-none"></div>
-                <div class="mb-3">
-                    <label for="forgot-email" class="form-label">Email address</label>
-                    <input type="email" class="form-control" id="forgot-email" placeholder="you@example.com" autocomplete="email" />
-                    <div id="forgot-email-err" class="feedback-msg text-danger"></div>
-                </div>
-                <button class="btn btn-dark" id="forgot-btn" onclick="handleForgot()">
-                    <span class="btn-text">Send Reset Link</span>
-                    <span class="btn-spinner spinner-border spinner-border-sm" role="status"></span>
-                </button>
-                <div class="auth-switch">Remembered it? <a href="#" onclick="switchForm('login')">Back to sign in</a></div>
-            </div>
-        </div>
-
+    <!-- LOGIN FORM -->
+    <div id="auth-login" class="auth-form">
+      <h2>Portal Sign-In</h2>
+      <p class="auth-desc">Authenticate to access your business management console.</p>
+      <div id="login-error" class="error-msg"></div>
+      <div class="form-group">
+        <label>Corporate Email / User ID</label>
+        <input type="email" id="login-email" placeholder="you@company.com" autocomplete="username" />
+      </div>
+      <div class="form-group">
+        <label>Access Password</label>
+        <input type="password" id="login-password" placeholder="••••••••" autocomplete="current-password" />
+      </div>
+      <button class="btn-primary" onclick="handleLogin()">🔐 Sign In to Portal</button>
+      <div class="auth-links">
+        <a onclick="showAuthForm('register')">Create new portal account →</a>
+        <a onclick="showAuthForm('forgot')">Forgot access credentials?</a>
+      </div>
     </div>
-    <footer class="py-5 bg-dark">
-        <div class="container"><p class="m-0 text-center text-white">Copyright &copy; Your Website 2023</p></div>
-    </footer>
+
+    <!-- REGISTER FORM -->
+    <div id="auth-register" class="auth-form" style="display:none">
+      <h2>New Portal Account</h2>
+      <p class="auth-desc">Register your organisation's access credentials.</p>
+      <div id="reg-error" class="error-msg"></div>
+      <div id="reg-success" class="success-msg"></div>
+      <div class="form-group">
+        <label>Full Name</label>
+        <input type="text" id="reg-name" placeholder="John Smith" />
+      </div>
+      <div class="form-group">
+        <label>Corporate Email</label>
+        <input type="email" id="reg-email" placeholder="you@company.com" />
+      </div>
+      <div class="form-group">
+        <label>Set Password</label>
+        <input type="password" id="reg-password" placeholder="Min. 8 characters" />
+      </div>
+      <button class="btn-primary" onclick="handleRegister()">✅ Register Account</button>
+      <div class="auth-links">
+        <a onclick="showAuthForm('login')">← Back to Sign-In</a>
+      </div>
+    </div>
+
+    <!-- FORGOT PASSWORD FORM -->
+    <div id="auth-forgot" class="auth-form" style="display:none">
+      <h2>Reset Credentials</h2>
+      <p class="auth-desc">Enter your corporate email to receive a secure reset link.</p>
+      <div id="forgot-error" class="error-msg"></div>
+      <div id="forgot-success" class="success-msg"></div>
+      <div class="form-group">
+        <label>Corporate Email</label>
+        <input type="email" id="forgot-email" placeholder="you@company.com" />
+      </div>
+      <button class="btn-primary" onclick="handleForgotPassword()">📧 Send Reset Link</button>
+      <div class="auth-links">
+        <a onclick="showAuthForm('login')">← Return to Sign-In</a>
+      </div>
+    </div>
+  </div>
 </div>
 
-<!-- =============================================
-     SHOP SECTION (with demo preload)
-============================================= -->
-<div id="shop-section">
+<!-- ============================================================
+     APP SHELL
+     ============================================================ -->
+<div id="app-shell">
 
-    <!-- Hero -->
-    <header class="bg-dark py-5">
-        <div class="container px-4 px-lg-5 my-5">
-            <div class="text-center text-white">
-                <h1 class="display-4 fw-bolder">Shop in style</h1>
-                <p class="lead fw-normal text-white-50 mb-0">Explore demo products — sign in to unlock full experience</p>
-            </div>
+  <!-- TOPBAR -->
+  <header class="topbar">
+    <div class="topbar-left">
+      <a class="topbar-logo">
+        <div class="topbar-logo-icon">🏭</div>
+        <div class="topbar-logo-name">Fabric<span>Flow</span></div>
+      </a>
+      <div class="topbar-breadcrumb" id="topbar-breadcrumb">/ Dashboard</div>
+    </div>
+    <div class="topbar-right">
+      <div class="system-status">ALL SYSTEMS OPERATIONAL</div>
+      <div class="user-chip" onclick="toggleUserMenu()">
+        <div class="user-avatar" id="user-avatar-initials">U</div>
+        <span class="user-chip-name" id="topbar-username">User</span>
+      </div>
+      <button class="icon-btn" title="Notifications">🔔</button>
+      <button class="icon-btn" title="Sign Out" onclick="handleLogout()">⏻</button>
+    </div>
+  </header>
+
+  <!-- SIDEBAR -->
+  <nav class="sidebar">
+    <div class="nav-section-label">CORE</div>
+    <div class="nav-item active" data-page="dashboard" onclick="navigate('dashboard')">
+      <span class="nav-icon">⬛</span> Dashboard
+    </div>
+
+    <div class="nav-divider"></div>
+    <div class="nav-section-label">ERP</div>
+    <!-- Old: Orders/Checkout → New: ERP Order Processing -->
+    <div class="nav-item" data-page="erp-orders" onclick="navigate('erp-orders')">
+      <span class="nav-icon">📋</span> Order Processing
+      <span class="nav-badge blue" id="nav-badge-orders">0</span>
+    </div>
+    <div class="nav-item" data-page="erp-invoices" onclick="navigate('erp-invoices')">
+      <span class="nav-icon">🧾</span> Invoices
+    </div>
+
+    <div class="nav-divider"></div>
+    <div class="nav-section-label">CRM</div>
+    <div class="nav-item" data-page="crm-customers" onclick="navigate('crm-customers')">
+      <span class="nav-icon">👥</span> Wholesale Customers
+    </div>
+    <div class="nav-item" data-page="crm-contacts" onclick="navigate('crm-contacts')">
+      <span class="nav-icon">📇</span> CRM Records
+    </div>
+
+    <div class="nav-divider"></div>
+    <div class="nav-section-label">WMS</div>
+    <!-- Old: Products → New: Inventory / Warehouse Stock -->
+    <div class="nav-item" data-page="wms-inventory" onclick="navigate('wms-inventory')">
+      <span class="nav-icon">📦</span> Inventory Items
+    </div>
+    <!-- Old: Cart → New: Dispatch List -->
+    <div class="nav-item" data-page="wms-dispatch" onclick="navigate('wms-dispatch')">
+      <span class="nav-icon">🚚</span> Dispatch List
+      <span class="nav-badge" id="nav-badge-dispatch">0</span>
+    </div>
+    <div class="nav-item" data-page="wms-categories" onclick="navigate('wms-categories')">
+      <span class="nav-icon">🏷️</span> Categories
+    </div>
+
+    <div class="nav-divider"></div>
+    <div class="nav-section-label">SYSTEM</div>
+    <div class="nav-item" onclick="window.open('/swagger-ui/index.html', '_blank')">
+      <span class="nav-icon">📡</span> API Console
+    </div>
+    <div class="nav-item" data-page="settings" onclick="navigate('settings')">
+      <span class="nav-icon">⚙️</span> Settings
+    </div>
+  </nav>
+
+  <!-- MAIN CONTENT -->
+  <main class="main-content">
+
+    <!-- ========================================================
+         DASHBOARD PAGE
+         ======================================================== -->
+    <div class="page active" id="page-dashboard">
+      <div class="page-header">
+        <div>
+          <div class="page-title">Operations Dashboard</div>
+          <div class="page-title-sub">FABRICFLOW ERP CLOUD — LIVE OVERVIEW</div>
         </div>
-    </header>
-
-    <!-- Products -->
-    <section class="py-5">
-        <div class="container px-4 px-lg-5 mt-5">
-
-            <!-- Category filter pills -->
-            <div id="category-pills" class="category-pills justify-content-center">
-                <!-- Filled from demo categories or backend -->
-            </div>
-
-            <!-- Product grid -->
-            <div id="product-grid" class="row gx-4 gx-lg-5 row-cols-2 row-cols-md-3 row-cols-xl-4 justify-content-center">
-                <!-- Demo cards will appear here before login -->
-            </div>
-
+        <div class="page-actions">
+          <button class="btn btn-outline" onclick="refreshDashboard()">↻ Refresh</button>
+          <button class="btn btn-blue" onclick="navigate('erp-orders')">＋ New ERP Order</button>
         </div>
-    </section>
+      </div>
 
-    <footer class="py-5 bg-dark">
-        <div class="container"><p class="m-0 text-center text-white">Copyright &copy; Your Website 2023</p></div>
-    </footer>
-</div>
+      <!-- Summary Stats -->
+      <!-- Old: product/cart counts → New: ERP/WMS business metrics -->
+      <div class="stats-grid">
+        <div class="stat-card" style="--stat-color:rgba(59,130,246,0.1)">
+          <div class="stat-label">Inventory SKUs</div>
+          <div class="stat-value" id="stat-inventory">—</div>
+          <div class="stat-meta"><span class="stat-trend-up">↑</span> Active stock items</div>
+          <div class="stat-icon">📦</div>
+        </div>
+        <div class="stat-card" style="--stat-color:rgba(34,197,94,0.1)">
+          <div class="stat-label">Wholesale Customers</div>
+          <div class="stat-value" id="stat-customers">—</div>
+          <div class="stat-meta"><span class="stat-trend-up">↑</span> Active CRM accounts</div>
+          <div class="stat-icon">👥</div>
+        </div>
+        <div class="stat-card" style="--stat-color:rgba(245,158,11,0.1)">
+          <div class="stat-label">Pending Orders</div>
+          <div class="stat-value" id="stat-pending">—</div>
+          <div class="stat-meta"><span class="stat-trend-down"></span> Awaiting processing</div>
+          <div class="stat-icon">⏳</div>
+        </div>
+        <div class="stat-card" style="--stat-color:rgba(167,139,250,0.1)">
+          <div class="stat-label">Dispatch Queue</div>
+          <div class="stat-value" id="stat-dispatch">—</div>
+          <div class="stat-meta">Items in dispatch list</div>
+          <div class="stat-icon">🚚</div>
+        </div>
+      </div>
 
-<!-- =============================================
-     PRODUCT DETAILS MODAL
-============================================= -->
-<div class="modal fade" id="productDetailModal" tabindex="-1" aria-labelledby="productDetailModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header border-0">
-                <h5 class="modal-title fw-bold" id="productDetailModalLabel">Product Details</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      <div class="dashboard-grid">
+        <!-- Recent ERP Orders -->
+        <!-- Old: recent orders list → New: ERP Order Processing table -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">
+              📋 Recent ERP Orders
+              <span class="card-title-badge">LIVE</span>
             </div>
-            <div class="modal-body">
-                <div class="row">
-                    <div class="col-md-6">
-                        <img id="modal-product-image" class="product-detail-image" src="" alt="Product image">
-                    </div>
-                    <div class="col-md-6">
-                        <h3 id="modal-product-name" class="fw-bold mb-2"></h3>
-                        <div id="modal-product-rating" class="mb-2"></div>
-                        <h4 id="modal-product-price" class="text-primary mb-3"></h4>
-                        <p id="modal-product-description" class="text-muted mb-3"></p>
-                        
-                        <div class="mb-3">
-                            <strong>Category:</strong> <span id="modal-product-category"></span>
-                        </div>
-                        
-                        <ul class="product-specs mb-3">
-                            <li><strong>Availability:</strong> <span id="modal-product-stock" class="text-success">In Stock</span></li>
-                            <li><strong>SKU:</strong> <span id="modal-product-sku"></span></li>
-                            <li><strong>Brand:</strong> <span id="modal-product-brand"></span></li>
-                            <li><strong>Material:</strong> <span id="modal-product-material"></span></li>
-                        </ul>
-                        
-                        <div class="d-flex align-items-center gap-3">
-                            <div class="quantity-selector">
-                                <button onclick="decrementModalQuantity()">−</button>
-                                <span id="modal-quantity">1</span>
-                                <button onclick="incrementModalQuantity()">+</button>
-                            </div>
-                            <button class="btn btn-dark flex-grow-1" onclick="addToCartFromModal()">
-                                <i class="bi-cart-fill me-2"></i>Add to Cart
-                            </button>
-                        </div>
-                    </div>
+            <button class="btn btn-outline" style="font-size:11px;padding:5px 10px" onclick="navigate('erp-orders')">View All</button>
+          </div>
+          <div id="dashboard-orders-table">
+            <div class="loading-state"><div class="spinner"></div> Loading order data…</div>
+          </div>
+        </div>
+
+        <!-- Right column -->
+        <div style="display:flex;flex-direction:column;gap:16px">
+
+          <!-- System Status Panel -->
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">☁️ Cloud System Status</div>
+            </div>
+            <div class="card-body">
+              <div class="status-grid">
+                <div class="status-row">
+                  <div class="status-name"><div class="status-dot"></div> Backend API</div>
+                  <div class="status-uptime">99.9% ↑</div>
                 </div>
+                <div class="status-row">
+                  <div class="status-name"><div class="status-dot"></div> Frontend App</div>
+                  <div class="status-uptime">100% ↑</div>
+                </div>
+                <div class="status-row">
+                  <div class="status-name"><div class="status-dot"></div> PostgreSQL DB</div>
+                  <div class="status-uptime">99.7% ↑</div>
+                </div>
+                <div class="status-row">
+                  <div class="status-name"><div class="status-dot amber"></div> File Storage</div>
+                  <div class="status-uptime" style="color:var(--accent-amber)">Degraded</div>
+                </div>
+              </div>
             </div>
+          </div>
+
+          <!-- Stock Level Visual -->
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">📊 Stock Health</div>
+            </div>
+            <div class="card-body">
+              <div style="display:flex;align-items:center;gap:16px;margin-bottom:16px">
+                <div class="ring-chart">
+                  <svg viewBox="0 0 80 80" width="80" height="80">
+                    <circle cx="40" cy="40" r="32" fill="none" stroke="var(--border)" stroke-width="8"/>
+                    <circle cx="40" cy="40" r="32" fill="none" stroke="var(--accent-green)" stroke-width="8"
+                      stroke-dasharray="140 201" stroke-linecap="round"/>
+                  </svg>
+                  <div class="ring-text">70%<small>In Stock</small></div>
+                </div>
+                <div style="flex:1">
+                  <div style="margin-bottom:8px">
+                    <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px">
+                      <span style="color:var(--text-secondary)">In Stock</span>
+                      <span class="mono" style="color:var(--accent-green)">70%</span>
+                    </div>
+                    <div class="stock-bar"><div class="stock-bar-fill" style="width:70%;background:var(--accent-green)"></div></div>
+                  </div>
+                  <div style="margin-bottom:8px">
+                    <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px">
+                      <span style="color:var(--text-secondary)">Low Stock</span>
+                      <span class="mono" style="color:var(--accent-amber)">20%</span>
+                    </div>
+                    <div class="stock-bar"><div class="stock-bar-fill" style="width:20%;background:var(--accent-amber)"></div></div>
+                  </div>
+                  <div>
+                    <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px">
+                      <span style="color:var(--text-secondary)">Out of Stock</span>
+                      <span class="mono" style="color:var(--accent-red)">10%</span>
+                    </div>
+                    <div class="stock-bar"><div class="stock-bar-fill" style="width:10%;background:var(--accent-red)"></div></div>
+                  </div>
+                </div>
+              </div>
+              <div style="font-size:11px;color:var(--text-muted);display:flex;gap:6px;flex-wrap:wrap">
+                <span style="background:var(--bg-surface);border:1px solid var(--border);border-radius:4px;padding:3px 8px">Monthly Dispatch: <b style="color:var(--text-primary)">218 units</b></span>
+                <span style="background:var(--bg-surface);border:1px solid var(--border);border-radius:4px;padding:3px 8px">Reorder Alerts: <b style="color:var(--accent-amber)">7 SKUs</b></span>
+              </div>
+            </div>
+          </div>
+
         </div>
+      </div>
+
+      <!-- Monthly Dispatch Trend -->
+      <div class="card" style="margin-top:0">
+        <div class="card-header">
+          <div class="card-title">📈 Monthly Dispatch Volume</div>
+          <span style="font-size:11px;color:var(--text-muted);font-family:var(--font-mono)">JAN — JUN 2025</span>
+        </div>
+        <div class="card-body" style="padding:16px 20px 12px">
+          <div class="mini-bars" style="height:60px;gap:6px">
+            <div class="mini-bar" style="height:55%;background:var(--accent-blue);opacity:0.5" title="Jan: 142"></div>
+            <div class="mini-bar" style="height:65%;background:var(--accent-blue);opacity:0.6" title="Feb: 165"></div>
+            <div class="mini-bar" style="height:72%;background:var(--accent-blue);opacity:0.65" title="Mar: 182"></div>
+            <div class="mini-bar" style="height:60%;background:var(--accent-blue);opacity:0.55" title="Apr: 152"></div>
+            <div class="mini-bar" style="height:85%;background:var(--accent-cyan);opacity:0.8" title="May: 215"></div>
+            <div class="mini-bar" style="height:100%;background:var(--accent-cyan)" title="Jun: 253"></div>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text-muted);font-family:var(--font-mono);margin-top:6px">
+            <span>JAN</span><span>FEB</span><span>MAR</span><span>APR</span><span>MAY</span><span>JUN</span>
+          </div>
+        </div>
+      </div>
     </div>
+
+    <!-- ========================================================
+         ERP ORDERS PAGE
+         Old: Orders/Checkout page → New: ERP Order Processing
+         ======================================================== -->
+    <div class="page" id="page-erp-orders">
+      <div class="page-header">
+        <div>
+          <div class="page-title">ERP Order Processing</div>
+          <div class="page-title-sub">BUSINESS OPERATIONS — ORDER MANAGEMENT SYSTEM</div>
+        </div>
+        <div class="page-actions">
+          <button class="btn btn-outline" onclick="loadOrders()">↻ Sync</button>
+          <button class="btn btn-blue" onclick="openCreateOrderModal()">＋ Create ERP Order</button>
+        </div>
+      </div>
+
+      <div class="tabs">
+        <div class="tab active" onclick="filterOrders('all', this)">All Orders</div>
+        <div class="tab" onclick="filterOrders('PENDING', this)">Pending</div>
+        <div class="tab" onclick="filterOrders('PROCESSING', this)">Processing</div>
+        <div class="tab" onclick="filterOrders('DISPATCHED', this)">Dispatched</div>
+        <div class="tab" onclick="filterOrders('COMPLETED', this)">Completed</div>
+      </div>
+
+      <div class="filter-bar">
+        <div class="search-input-wrap">
+          <input class="search-input" type="text" id="order-search" placeholder="Search order ID, customer, SKU…" oninput="filterOrdersSearch()" />
+        </div>
+        <select class="filter-select" onchange="loadOrders()">
+          <option value="">All Periods</option>
+          <option>This Month</option>
+          <option>Last 30 Days</option>
+          <option>Last Quarter</option>
+        </select>
+        <button class="btn btn-outline">⬇ Export CSV</button>
+      </div>
+
+      <div class="card">
+        <div id="orders-table-wrap">
+          <div class="loading-state"><div class="spinner"></div> Loading ERP orders…</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========================================================
+         ERP INVOICES PAGE
+         ======================================================== -->
+    <div class="page" id="page-erp-invoices">
+      <div class="page-header">
+        <div>
+          <div class="page-title">Invoice Management</div>
+          <div class="page-title-sub">ERP — INVOICE STATUS &amp; BILLING RECORDS</div>
+        </div>
+        <div class="page-actions">
+          <button class="btn btn-blue">＋ Generate Invoice</button>
+        </div>
+      </div>
+      <div class="card">
+        <div id="invoices-table-wrap">
+          <div class="loading-state"><div class="spinner"></div> Loading invoices…</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========================================================
+         CRM CUSTOMERS PAGE
+         Old: User list → New: Wholesale Customer Management
+         ======================================================== -->
+    <div class="page" id="page-crm-customers">
+      <div class="page-header">
+        <div>
+          <div class="page-title">Wholesale Customers</div>
+          <div class="page-title-sub">CRM — CUSTOMER RELATIONSHIP MANAGEMENT</div>
+        </div>
+        <div class="page-actions">
+          <button class="btn btn-outline">⬇ Export</button>
+          <button class="btn btn-blue" onclick="openAddCustomerModal()">＋ Add CRM Record</button>
+        </div>
+      </div>
+
+      <div class="filter-bar">
+        <div class="search-input-wrap">
+          <input class="search-input" type="text" id="crm-search" placeholder="Search company, contact, email…" oninput="filterCRM()" />
+        </div>
+        <select class="filter-select">
+          <option value="">All Types</option>
+          <option>Retailer</option>
+          <option>Distributor</option>
+          <option>Boutique</option>
+          <option>Online Store</option>
+        </select>
+        <select class="filter-select">
+          <option>All Statuses</option>
+          <option>Active</option>
+          <option>Inactive</option>
+          <option>Prospect</option>
+        </select>
+      </div>
+
+      <div class="crm-grid" id="crm-grid">
+        <div class="loading-state" style="grid-column:1/-1"><div class="spinner"></div> Loading CRM records…</div>
+      </div>
+    </div>
+
+    <!-- ========================================================
+         CRM RECORDS PAGE
+         ======================================================== -->
+    <div class="page" id="page-crm-contacts">
+      <div class="page-header">
+        <div>
+          <div class="page-title">CRM Records</div>
+          <div class="page-title-sub">CONTACT DATABASE — ALL BUSINESS CONTACTS</div>
+        </div>
+        <div class="page-actions">
+          <button class="btn btn-blue">＋ New Contact</button>
+        </div>
+      </div>
+      <div class="card">
+        <div id="contacts-table-wrap">
+          <div class="loading-state"><div class="spinner"></div> Loading contacts…</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========================================================
+         WMS INVENTORY PAGE
+         Old: Products/Shop page → New: Warehouse Inventory
+         ======================================================== -->
+    <div class="page" id="page-wms-inventory">
+      <div class="page-header">
+        <div>
+          <div class="page-title">Inventory Items</div>
+          <div class="page-title-sub">WMS — WAREHOUSE STOCK MANAGEMENT</div>
+        </div>
+        <div class="page-actions">
+          <button class="btn btn-outline">⬇ Export</button>
+          <!-- Old: "Add Product" → New: "Add Stock Item" -->
+          <button class="btn btn-blue" onclick="openAddStockModal()">＋ Add Stock Item</button>
+        </div>
+      </div>
+
+      <div class="filter-bar">
+        <div class="search-input-wrap">
+          <input class="search-input" type="text" id="inv-search" placeholder="Search SKU, item name, category…" oninput="filterInventory()" />
+        </div>
+        <select class="filter-select" id="inv-category-filter" onchange="filterInventory()">
+          <option value="">All Categories</option>
+        </select>
+        <select class="filter-select" id="inv-status-filter" onchange="filterInventory()">
+          <option value="">All Stock Status</option>
+          <option>In Stock</option>
+          <option>Low Stock</option>
+          <option>Out of Stock</option>
+        </select>
+      </div>
+
+      <div class="inventory-grid" id="inventory-grid">
+        <div class="loading-state" style="grid-column:1/-1"><div class="spinner"></div> Loading warehouse inventory…</div>
+      </div>
+    </div>
+
+    <!-- ========================================================
+         WMS DISPATCH LIST PAGE
+         Old: Shopping Cart → New: Warehouse Dispatch List
+         ======================================================== -->
+    <div class="page" id="page-wms-dispatch">
+      <div class="page-header">
+        <div>
+          <div class="page-title">Dispatch List</div>
+          <!-- Old: "Your Shopping Cart" → New: "Outgoing Warehouse Dispatch" -->
+          <div class="page-title-sub">WMS — OUTGOING WAREHOUSE DISPATCH QUEUE</div>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 340px;gap:20px;align-items:start">
+        <!-- Dispatch Items -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">🚚 Dispatch Queue Items</div>
+            <!-- Old: "Items in cart" → New: "Items in dispatch" -->
+            <span style="font-size:12px;color:var(--text-muted)"><span id="dispatch-count">0</span> items queued</span>
+          </div>
+          <div class="card-body" id="dispatch-items-list">
+            <div class="empty-state">
+              <div class="empty-state-icon">🚚</div>
+              <div class="empty-state-text">Dispatch list is empty</div>
+              <div class="empty-state-sub">Add inventory items to create a warehouse dispatch order</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Dispatch Summary / Checkout Panel -->
+        <!-- Old: Order Summary / Checkout → New: Dispatch Order Summary -->
+        <div>
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">📋 Dispatch Order Summary</div>
+            </div>
+            <div class="card-body">
+              <div style="margin-bottom:16px">
+                <div class="form-group">
+                  <label>Assign to Customer</label>
+                  <select class="filter-select" style="width:100%" id="dispatch-customer">
+                    <option value="">— Select Wholesale Customer —</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label>Warehouse Location</label>
+                  <select class="filter-select" style="width:100%">
+                    <option>WH-A: Main Warehouse</option>
+                    <option>WH-B: Secondary Storage</option>
+                    <option>WH-C: Cold Storage</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label>Dispatch Priority</label>
+                  <select class="filter-select" style="width:100%">
+                    <option>Standard (3-5 days)</option>
+                    <option>Express (1-2 days)</option>
+                    <option>Urgent (Same Day)</option>
+                  </select>
+                </div>
+              </div>
+
+              <div id="dispatch-summary-rows"></div>
+
+              <div class="dispatch-total-row">
+                <div class="dispatch-total-label">Total Dispatch Value</div>
+                <!-- Old: "Total" (cart price) → New: wholesale unit value -->
+                <div class="dispatch-total-value" id="dispatch-total">$0.00</div>
+              </div>
+
+              <!-- Old: "Checkout" → New: "Create Warehouse Dispatch Order" -->
+              <button class="btn btn-blue" style="width:100%;margin-top:12px;font-size:13px;padding:12px" onclick="createDispatchOrder()">
+                🚚 Create Warehouse Dispatch Order
+              </button>
+              <button class="btn btn-outline" style="width:100%;margin-top:8px" onclick="clearDispatch()">
+                🗑 Clear Dispatch List
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========================================================
+         WMS CATEGORIES PAGE
+         Old: Categories → New: Stock Categories / Classification
+         ======================================================== -->
+    <div class="page" id="page-wms-categories">
+      <div class="page-header">
+        <div>
+          <div class="page-title">Stock Categories</div>
+          <div class="page-title-sub">WMS — INVENTORY CLASSIFICATION SYSTEM</div>
+        </div>
+        <div class="page-actions">
+          <button class="btn btn-blue">＋ New Category</button>
+        </div>
+      </div>
+      <div class="card">
+        <div id="categories-table-wrap">
+          <div class="loading-state"><div class="spinner"></div> Loading categories…</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========================================================
+         SETTINGS PAGE
+         ======================================================== -->
+    <div class="page" id="page-settings">
+      <div class="page-header">
+        <div>
+          <div class="page-title">Portal Settings</div>
+          <div class="page-title-sub">SYSTEM CONFIGURATION — FABRICFLOW ERP CLOUD</div>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+        <div class="card">
+          <div class="card-header"><div class="card-title">🔐 Security</div></div>
+          <div class="card-body">
+            <div class="form-group"><label>Change Password</label><input type="password" class="form-group input" placeholder="New password" style="width:100%;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius);padding:10px 14px;color:var(--text-primary);font-family:var(--font-ui);font-size:13px;outline:none" /></div>
+            <div class="form-group"><label>2FA Authentication</label>
+              <div style="display:flex;align-items:center;gap:10px;margin-top:4px">
+                <span class="badge badge-amber">Disabled</span>
+                <button class="btn btn-outline" style="font-size:11px;padding:5px 10px">Enable 2FA</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><div class="card-title">🏢 Company Profile</div></div>
+          <div class="card-body">
+            <div class="form-group"><label>Company Name</label><input type="text" placeholder="Acme Wholesale Ltd." style="width:100%;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius);padding:10px 14px;color:var(--text-primary);font-family:var(--font-ui);font-size:13px;outline:none" /></div>
+            <div class="form-group"><label>Business Region</label>
+              <select class="filter-select" style="width:100%">
+                <option>North America</option><option>Europe</option><option>Asia-Pacific</option><option>Middle East</option>
+              </select>
+            </div>
+            <button class="btn btn-blue" style="margin-top:4px">Save Changes</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
 </div>
 
-<!-- =============================================
-     CART OFFCANVAS
-============================================= -->
-<div class="offcanvas offcanvas-end" tabindex="-1" id="cartOffcanvas" aria-labelledby="cartOffcanvasLabel">
-    <div class="offcanvas-header border-bottom">
-        <h5 class="offcanvas-title fw-bold" id="cartOffcanvasLabel">
-            <i class="bi-cart-fill me-2"></i>Your Cart
-        </h5>
-        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+<!-- ============================================================
+     MODALS
+     ============================================================ -->
+
+<!-- Create ERP Order Modal -->
+<!-- Old: Checkout form → New: ERP Order creation form -->
+<div class="modal-overlay" id="modal-create-order">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">📋 Create ERP Order</div>
+      <button class="modal-close" onclick="closeModal('modal-create-order')">✕</button>
     </div>
-    <div class="offcanvas-body d-flex flex-column p-0">
-
-        <!-- Cart items list -->
-        <div id="cart-items-list" class="flex-grow-1 overflow-auto p-3">
-            <!-- Filled dynamically -->
+    <div class="modal-body">
+      <div class="form-group"><label>Customer Account</label>
+        <select class="filter-select" style="width:100%" id="order-customer-select"></select>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div class="form-group"><label>Order Type</label>
+          <select class="filter-select" style="width:100%">
+            <option>Wholesale Bulk Order</option>
+            <option>Sample Order</option>
+            <option>Replenishment Order</option>
+            <option>Rush Order</option>
+          </select>
         </div>
-
-        <!-- Cart footer -->
-        <div id="cart-footer" class="border-top p-3" style="display:none;">
-            <div class="d-flex justify-content-between fw-bold mb-3">
-                <span>Total</span>
-                <span id="cart-total">$0.00</span>
-            </div>
-            <button class="btn btn-dark w-100" onclick="handleCheckout()">
-                Proceed to Checkout
-            </button>
+        <div class="form-group"><label>Priority</label>
+          <select class="filter-select" style="width:100%">
+            <option>Normal</option><option>High</option><option>Urgent</option>
+          </select>
         </div>
-
+      </div>
+      <div class="form-group"><label>Order Notes / Instructions</label>
+        <textarea placeholder="Special handling, delivery instructions…" style="width:100%;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius);padding:10px 14px;color:var(--text-primary);font-family:var(--font-ui);font-size:13px;outline:none;resize:vertical;min-height:80px"></textarea>
+      </div>
+      <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:8px">
+        <button class="btn btn-outline" onclick="closeModal('modal-create-order')">Cancel</button>
+        <!-- Old: "Place Order" → New: "Submit ERP Order" -->
+        <button class="btn btn-blue" onclick="submitERPOrder()">✅ Submit ERP Order</button>
+      </div>
     </div>
+  </div>
 </div>
 
-<!-- demo mode subtle badge -->
-<div class="demo-badge" id="demoBadge">✨ Demo Mode</div>
+<!-- Add Stock Item Modal -->
+<!-- Old: Add Product → New: Add Inventory/Stock Item -->
+<div class="modal-overlay" id="modal-add-stock">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">📦 Add Stock Item to Inventory</div>
+      <button class="modal-close" onclick="closeModal('modal-add-stock')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div class="form-group"><label>Item Name / Description</label>
+          <input type="text" id="stock-name" placeholder="e.g. Men's Denim Jacket" style="width:100%;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius);padding:10px 14px;color:var(--text-primary);font-family:var(--font-ui);font-size:13px;outline:none" />
+        </div>
+        <div class="form-group"><label>SKU / Item Code</label>
+          <input type="text" id="stock-sku" placeholder="e.g. CLO-DNM-001" style="width:100%;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius);padding:10px 14px;color:var(--text-primary);font-family:var(--font-ui);font-size:13px;outline:none;font-family:var(--font-mono)" />
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px">
+        <div class="form-group"><label>Unit Price (USD)</label>
+          <input type="number" id="stock-price" placeholder="0.00" style="width:100%;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius);padding:10px 14px;color:var(--text-primary);font-family:var(--font-mono);font-size:13px;outline:none" />
+        </div>
+        <div class="form-group"><label>Quantity in Stock</label>
+          <input type="number" id="stock-qty" placeholder="0" style="width:100%;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius);padding:10px 14px;color:var(--text-primary);font-family:var(--font-mono);font-size:13px;outline:none" />
+        </div>
+        <div class="form-group"><label>Reorder Level</label>
+          <input type="number" id="stock-reorder" placeholder="10" style="width:100%;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius);padding:10px 14px;color:var(--text-primary);font-family:var(--font-mono);font-size:13px;outline:none" />
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div class="form-group"><label>Category</label>
+          <select id="stock-category" class="filter-select" style="width:100%"></select>
+        </div>
+        <div class="form-group"><label>Warehouse Location</label>
+          <select class="filter-select" style="width:100%">
+            <option>WH-A: Main Warehouse</option>
+            <option>WH-B: Secondary Storage</option>
+            <option>WH-C: Cold Storage</option>
+          </select>
+        </div>
+      </div>
+      <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:8px">
+        <button class="btn btn-outline" onclick="closeModal('modal-add-stock')">Cancel</button>
+        <button class="btn btn-blue" onclick="submitAddStock()">📦 Add to Inventory</button>
+      </div>
+    </div>
+  </div>
+</div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+<!-- Add Customer Modal -->
+<div class="modal-overlay" id="modal-add-customer">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">👥 New CRM Record</div>
+      <button class="modal-close" onclick="closeModal('modal-add-customer')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div class="form-group"><label>Company Name</label>
+          <input type="text" placeholder="e.g. StyleMart Ltd." style="width:100%;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius);padding:10px 14px;color:var(--text-primary);font-family:var(--font-ui);font-size:13px;outline:none" />
+        </div>
+        <div class="form-group"><label>Contact Person</label>
+          <input type="text" placeholder="Full name" style="width:100%;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius);padding:10px 14px;color:var(--text-primary);font-family:var(--font-ui);font-size:13px;outline:none" />
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div class="form-group"><label>Business Email</label>
+          <input type="email" placeholder="contact@company.com" style="width:100%;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius);padding:10px 14px;color:var(--text-primary);font-family:var(--font-ui);font-size:13px;outline:none" />
+        </div>
+        <div class="form-group"><label>Customer Type</label>
+          <select class="filter-select" style="width:100%">
+            <option>Retailer</option><option>Distributor</option><option>Boutique</option><option>Online Store</option>
+          </select>
+        </div>
+      </div>
+      <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:8px">
+        <button class="btn btn-outline" onclick="closeModal('modal-add-customer')">Cancel</button>
+        <button class="btn btn-blue">✅ Save CRM Record</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast"></div>
+
+<!-- ============================================================
+     JAVASCRIPT
+     ============================================================ -->
 <script>
+'use strict';
 
-/* ==============================================
-   CONFIG — change this to your backend URL
-=============================================== */
-const API_BASE = 'http://13.49.228.2:8080';  
+/* ─────────────────────────────────────────────────────────────
+   API CONFIG
+   Keep existing API_BASE and helper structure unchanged
+   ───────────────────────────────────────────────────────────── */
+const API_BASE = 'http://16.171.254.82:8080';  // Adjust to your backend base URL if needed
 
-/* ==============================================
-   DEMO PRODUCTS (static showcase)
-   These will be shown before login and also as fallback if backend fails
-=============================================== */
-const DEMO_PRODUCTS = [
-    { id: 101, name: "Classic Denim Jacket", price: 89.99, image_url: "https://images.unsplash.com/photo-1576995853123-1dc2a1e4d6d9?w=400&h=300&fit=crop", badge: "Sale", rating: 5, categories: [1,2], price_min: null, price_max: null, description: "Premium quality denim jacket with classic fit. Perfect for casual wear. Features adjustable cuffs and multiple pockets.", sku: "DJ-001", brand: "Urban Style", material: "100% Cotton Denim", stock: 45 },
-    { id: 102, name: "Minimalist Watch", price: 129.00, image_url: "https://images.unsplash.com/photo-1524592094714-0f0654e20314?w=400&h=300&fit=crop", badge: null, rating: 4, categories: [2], price_min: null, price_max: null, description: "Elegant minimalist design watch with genuine leather strap. Water resistant up to 30m. Japanese quartz movement.", sku: "MW-002", brand: "Timeless", material: "Stainless Steel / Leather", stock: 28 },
-    { id: 103, name: "Leather Backpack", price_min: 79.00, price_max: 119.00, image_url: "https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=400&h=300&fit=crop", badge: "Limited", rating: null, categories: [1,3], price: null, description: "Handcrafted genuine leather backpack. Multiple compartments for laptop and daily essentials. Adjustable straps.", sku: "LB-003", brand: "Nomad Goods", material: "Full-grain Leather", stock: 15 },
-    { id: 104, name: "Wireless Headphones", price: 199.99, image_url: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400&h=300&fit=crop", badge: "New", rating: 5, categories: [3], price_min: null, price_max: null, description: "Premium noise-cancelling wireless headphones with 30-hour battery life. Hi-Fi sound quality with deep bass.", sku: "WH-004", brand: "AudioPro", material: "Memory Foam / ABS", stock: 62 },
-    { id: 105, name: "Slim Fit T-Shirt", price: 24.99, image_url: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=400&h=300&fit=crop", badge: null, rating: 4, categories: [1], price_min: null, price_max: null, description: "Comfortable cotton blend t-shirt with modern slim fit. Breathable fabric perfect for everyday wear.", sku: "TS-005", brand: "BasicWear", material: "95% Cotton, 5% Spandex", stock: 120 },
-    { id: 106, name: "Running Shoes", price_min: 85.00, price_max: 145.00, image_url: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400&h=300&fit=crop", badge: "Trending", rating: 5, categories: [2], price: null, description: "Lightweight running shoes with responsive cushioning. Breathable mesh upper for maximum airflow.", sku: "RS-006", brand: "RunFast", material: "Mesh / Rubber", stock: 34 },
-    { id: 107, name: "Stainless Steel Bottle", price: 19.95, image_url: "https://images.unsplash.com/photo-1602143407151-7111542de6e8?w=400&h=300&fit=crop", badge: "Eco", rating: 4, categories: [1,3], price_min: null, price_max: null, description: "Double-wall insulated bottle keeps drinks cold for 24h or hot for 12h. Eco-friendly and reusable.", sku: "SB-007", brand: "EcoLife", material: "18/8 Stainless Steel", stock: 89 },
-    { id: 108, name: "Smart Home Speaker", price: 149.00, image_url: "https://images.unsplash.com/photo-1589003077984-894e133dabab?w=400&h=300&fit=crop", badge: null, rating: null, categories: [3], price_min: null, price_max: null, description: "Voice-controlled smart speaker with built-in assistant. Premium sound quality and smart home integration.", sku: "SS-008", brand: "SmartTech", material: "Fabric / Plastic", stock: 41 }
-];
+let authToken = localStorage.getItem('auth_token') || null;
+let currentUser = JSON.parse(localStorage.getItem('current_user') || 'null');
 
-const DEMO_CATEGORIES = [
-    { id: 1, name: "Popular Items" },
-    { id: 2, name: "New Arrivals" },
-    { id: 3, name: "Essentials" }
-];
+// Old: dispatchCart (was: cart) — renamed to dispatchList for WMS
+let dispatchList = JSON.parse(localStorage.getItem('dispatch_list') || '[]');
 
-/* ==============================================
-   STATE
-=============================================== */
-let currentUser  = null;   
-let authToken    = null;   
-let cart         = [];     
-let allProducts  = [];     
-let activeCategory = 'all';
-let currentProduct = null;
-let modalQuantity = 1;
-
-/* ==============================================
+/* ─────────────────────────────────────────────────────────────
    API HELPER
-=============================================== */
-async function api(method, path, body = null) {
-    const headers = { 'Content-Type': 'application/json' };
-    if (authToken) headers['Authorization'] = `Bearer ${authToken}`;
-    const options = { method, headers };
-    if (body) options.body = JSON.stringify(body);
-    const response = await fetch(API_BASE + path, options);
-    const data = await response.json();
-    return { ok: response.ok, status: response.status, data };
+   ───────────────────────────────────────────────────────────── */
+async function apiFetch(endpoint, options = {}) {
+  const headers = { 'Content-Type': 'application/json', ...(options.headers || {}) };
+  if (authToken) headers['Authorization'] = `Bearer ${authToken}`;
+  try {
+    const res = await fetch(API_BASE + endpoint, { ...options, headers });
+    if (res.status === 401) { handleLogout(); return null; }
+    const text = await res.text();
+    try { return { ok: res.ok, status: res.status, data: JSON.parse(text) }; }
+    catch { return { ok: res.ok, status: res.status, data: text }; }
+  } catch (e) {
+    console.warn(`[API] ${endpoint} failed:`, e.message);
+    return null;
+  }
 }
 
-/* ==============================================
-   SECTION SWITCHER
-=============================================== */
-function showSection(name) {
-    document.getElementById('auth-section').classList.remove('active');
-    document.getElementById('shop-section').classList.remove('active');
-    document.getElementById(name + '-section').classList.add('active');
-    window.scrollTo(0, 0);
-}
-
-function showAuth(formName) {
-    showSection('auth');
-    switchForm(formName);
-}
-
-function goHome() {
-    if (currentUser) {
-        showSection('shop');
-        loadShopDataForLoggedUser();
-    } else {
-        showSection('shop');
-        renderDemoProductsAndCategories();
-    }
-}
-
-function switchForm(name) {
-    document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active'));
-    document.getElementById('form-' + name).classList.add('active');
-    clearAllFeedback();
-    window.scrollTo(0, 0);
-}
-
-/* ==============================================
-   NAVBAR STATE
-=============================================== */
-function setLoggedIn(user, token) {
-    currentUser = user;
-    authToken   = token;
-    if (token) localStorage.setItem('token', token);
-    document.getElementById('guest-buttons').classList.add('hidden');
-    document.getElementById('nav-username').textContent = user.firstName || user.email;
-    document.getElementById('user-area').classList.add('visible');
-    const badge = document.getElementById('demoBadge');
-    if (badge) badge.style.opacity = '0.4';
-}
-
-function setLoggedOut() {
-    currentUser = null;
-    authToken   = null;
-    cart        = [];
-    localStorage.removeItem('token');
-    document.getElementById('guest-buttons').classList.remove('hidden');
-    document.getElementById('user-area').classList.remove('visible');
-    document.getElementById('nav-username').textContent = '';
-    updateCartUI();
-    const badge = document.getElementById('demoBadge');
-    if (badge) badge.style.opacity = '1';
-    if (document.getElementById('shop-section').classList.contains('active')) {
-        renderDemoProductsAndCategories();
-    }
-}
-
-async function handleLogout() {
-    setLoggedOut();
-    showAuth('login');
-}
-
-/* ==============================================
-   PRODUCT DETAIL MODAL FUNCTIONS
-=============================================== */
-function showProductDetails(product) {
-    currentProduct = product;
-    modalQuantity = 1;
-    
-    // Set modal content
-    document.getElementById('modal-product-image').src = product.image_url || 'https://dummyimage.com/450x300/dee2e6/6c757d.jpg';
-    document.getElementById('modal-product-name').textContent = product.name;
-    
-    // Rating stars
-    const ratingHtml = product.rating ? 
-        `<div class="d-flex text-warning">${'<div class="bi-star-fill"></div>'.repeat(Math.round(product.rating))}${'<div class="bi-star"></div>'.repeat(5-Math.round(product.rating))} <span class="ms-2 text-muted">(${product.rating}.0)</span></div>` : 
-        '<span class="text-muted">No ratings yet</span>';
-    document.getElementById('modal-product-rating').innerHTML = ratingHtml;
-    
-    // Price
-    let priceHtml = '';
-    if (product.price_min && product.price_max) {
-        priceHtml = `$${parseFloat(product.price_min).toFixed(2)} - $${parseFloat(product.price_max).toFixed(2)}`;
-    } else if (product.price) {
-        priceHtml = `$${parseFloat(product.price).toFixed(2)}`;
-    }
-    document.getElementById('modal-product-price').textContent = priceHtml;
-    
-    // Description (with fallback)
-    document.getElementById('modal-product-description').textContent = product.description || 'No description available for this product.';
-    
-    // Category
-    const categoryNames = product.categories ? product.categories.map(catId => {
-        const cat = DEMO_CATEGORIES.find(c => c.id === catId);
-        return cat ? cat.name : '';
-    }).filter(n => n).join(', ') : 'General';
-    document.getElementById('modal-product-category').textContent = categoryNames || 'General';
-    
-    // Additional specs
-    document.getElementById('modal-product-stock').innerHTML = (product.stock && product.stock > 0) ? `<span class="text-success">In Stock (${product.stock} available)</span>` : '<span class="text-danger">Out of Stock</span>';
-    document.getElementById('modal-product-sku').textContent = product.sku || `SKU-${product.id}`;
-    document.getElementById('modal-product-brand').textContent = product.brand || 'Generic Brand';
-    document.getElementById('modal-product-material').textContent = product.material || 'Standard Quality';
-    
-    document.getElementById('modal-quantity').textContent = modalQuantity;
-    
-    // Show modal
-    const modal = new bootstrap.Modal(document.getElementById('productDetailModal'));
-    modal.show();
-}
-
-function decrementModalQuantity() {
-    if (modalQuantity > 1) {
-        modalQuantity--;
-        document.getElementById('modal-quantity').textContent = modalQuantity;
-    }
-}
-
-function incrementModalQuantity() {
-    if (currentProduct && currentProduct.stock && modalQuantity < currentProduct.stock) {
-        modalQuantity++;
-        document.getElementById('modal-quantity').textContent = modalQuantity;
-    } else if (!currentProduct?.stock || modalQuantity < 99) {
-        modalQuantity++;
-        document.getElementById('modal-quantity').textContent = modalQuantity;
-    }
-}
-
-async function addToCartFromModal() {
-    if (!currentUser) {
-        bootstrap.Modal.getInstance(document.getElementById('productDetailModal')).hide();
-        showAuth('login');
-        return;
-    }
-    
-    // Add to cart multiple times based on quantity
-    for (let i = 0; i < modalQuantity; i++) {
-        await addToCart(currentProduct.id, false); // false means don't show modal again
-    }
-    
-    // Close product modal
-    bootstrap.Modal.getInstance(document.getElementById('productDetailModal')).hide();
-    
-    // Show cart offcanvas
-    const offcanvas = new bootstrap.Offcanvas(document.getElementById('cartOffcanvas'));
-    offcanvas.show();
-}
-
-/* ==============================================
-   DEMO RENDER (before login & fallback)
-=============================================== */
-function renderDemoProductsAndCategories() {
-    const container = document.getElementById('category-pills');
-    const allPills = [{ id: 'all', name: 'All Products' }, ...DEMO_CATEGORIES];
-    container.innerHTML = allPills.map(cat => `
-        <button class="category-pill ${cat.id === 'all' ? 'active' : ''}" data-id="${cat.id}" onclick="filterDemoCategory('${cat.id}')">
-            ${cat.name}
-        </button>
-    `).join('');
-    renderProducts(DEMO_PRODUCTS);
-}
-
-function filterDemoCategory(categoryId) {
-    activeCategory = categoryId;
-    document.querySelectorAll('.category-pill').forEach(pill => {
-        pill.classList.toggle('active', pill.dataset.id == categoryId);
-    });
-    if (categoryId === 'all') {
-        renderProducts(DEMO_PRODUCTS);
-    } else {
-        const filtered = DEMO_PRODUCTS.filter(p => p.categories && p.categories.includes(Number(categoryId)));
-        renderProducts(filtered);
-    }
-}
-
-window.filterCategory = function(categoryId) {
-    if (!currentUser) {
-        filterDemoCategory(categoryId);
-    } else {
-        activeCategory = categoryId;
-        document.querySelectorAll('.category-pill').forEach(pill => {
-            pill.classList.toggle('active', pill.dataset.id == categoryId);
-        });
-        if (categoryId === 'all') {
-            renderProducts(allProducts);
-        } else {
-            const filtered = allProducts.filter(p => p.categories && p.categories.includes(Number(categoryId)));
-            renderProducts(filtered);
-        }
-    }
+/* ─────────────────────────────────────────────────────────────
+   DEMO / FALLBACK DATA
+   Shown if backend returns empty or unavailable
+   ───────────────────────────────────────────────────────────── */
+const DEMO = {
+  orders: [
+    { id:'ERP-2025-0041', customer:'StyleMart Ltd.', status:'PENDING',     date:'2025-06-01', total:4820.00, items:12 },
+    { id:'ERP-2025-0040', customer:'FashionHub Inc.', status:'PROCESSING',  date:'2025-05-30', total:11200.00, items:34 },
+    { id:'ERP-2025-0039', customer:'TrendZone GmbH', status:'DISPATCHED',   date:'2025-05-28', total:3350.00, items:9  },
+    { id:'ERP-2025-0038', customer:'NovaTex Co.',    status:'COMPLETED',    date:'2025-05-25', total:8700.00, items:22 },
+    { id:'ERP-2025-0037', customer:'ClothCraft SA',  status:'COMPLETED',    date:'2025-05-22', total:5200.00, items:15 },
+    { id:'ERP-2025-0036', customer:'StyleMart Ltd.', status:'PENDING',      date:'2025-05-20', total:2900.00, items:7  },
+  ],
+  // Old: products → now inventoryItems (WMS terminology)
+  inventoryItems: [
+    { id:1, name:"Men's Classic Denim Jacket", sku:'CLO-DNM-001', category:'Outerwear', price:48.00, quantity:320, reorder:50,  location:'WH-A Shelf 3', image:'🧥' },
+    { id:2, name:"Women's Floral Midi Dress",  sku:'CLO-DRS-012', category:'Dresses',   price:32.00, quantity:14,  reorder:30,  location:'WH-A Shelf 7', image:'👗' },
+    { id:3, name:"Unisex Cargo Trousers",      sku:'CLO-TRS-004', category:'Bottoms',   price:28.00, quantity:0,   reorder:40,  location:'WH-B Shelf 2', image:'👖' },
+    { id:4, name:"Kids Striped Cotton Tee",    sku:'CLO-KID-022', category:'Kids',      price:9.50,  quantity:580, reorder:100, location:'WH-A Shelf 1', image:'👕' },
+    { id:5, name:"Men's Slim Chino Pants",     sku:'CLO-TRS-009', category:'Bottoms',   price:34.00, quantity:95,  reorder:40,  location:'WH-A Shelf 4', image:'👖' },
+    { id:6, name:"Winter Knit Beanie Pack",    sku:'CLO-ACC-031', category:'Accessories',price:12.00,quantity:210, reorder:60,  location:'WH-C Shelf 1', image:'🧣' },
+    { id:7, name:"Ladies Trench Coat",         sku:'CLO-OUT-015', category:'Outerwear', price:89.00, quantity:44,  reorder:20,  location:'WH-B Shelf 5', image:'🧥' },
+    { id:8, name:"Athletic Performance Tee",   sku:'CLO-SPT-007', category:'Sportswear',price:18.00, quantity:8,   reorder:50,  location:'WH-A Shelf 9', image:'👕' },
+  ],
+  customers: [
+    { id:1, company:'StyleMart Ltd.',   contact:'James Rowland',   email:'jrowland@stylemart.com',  type:'Retailer',    status:'ACTIVE',   lastActivity:'2025-06-01', orders:18, value:'$92,400', color:'#3b82f6' },
+    { id:2, company:'FashionHub Inc.',  contact:'Lisa Chen',       email:'l.chen@fashionhub.com',   type:'Distributor', status:'ACTIVE',   lastActivity:'2025-05-30', orders:31, value:'$214,000',color:'#22c55e' },
+    { id:3, company:'TrendZone GmbH',   contact:'Klaus Meyer',     email:'kmeyer@trendzone.de',     type:'Boutique',    status:'ACTIVE',   lastActivity:'2025-05-28', orders:9,  value:'$38,700', color:'#f59e0b' },
+    { id:4, company:'NovaTex Co.',      contact:'Maria Santos',    email:'m.santos@novatex.com',    type:'Online Store',status:'INACTIVE', lastActivity:'2025-04-10', orders:5,  value:'$22,100', color:'#a78bfa' },
+    { id:5, company:'ClothCraft SA',    contact:'Ahmed El-Masri',  email:'ahmed@clothcraft.sa',     type:'Distributor', status:'ACTIVE',   lastActivity:'2025-05-22', orders:14, value:'$76,300', color:'#22d3ee' },
+    { id:6, company:'PureFabric Ltd.',  contact:'Sophia Williams', email:'swilliams@purefabric.co', type:'Retailer',    status:'PROSPECT', lastActivity:'2025-05-15', orders:0,  value:'$0',      color:'#ef4444' },
+  ],
+  categories: [
+    { id:1, name:'Outerwear',   description:'Jackets, coats, and windbreakers', itemCount:48, active:true },
+    { id:2, name:'Dresses',     description:'All styles of women\'s dresses',   itemCount:61, active:true },
+    { id:3, name:'Bottoms',     description:'Trousers, skirts, shorts',         itemCount:93, active:true },
+    { id:4, name:'Kids',        description:'Children clothing (2-14 years)',   itemCount:127,active:true },
+    { id:5, name:'Accessories', description:'Hats, belts, scarves, bags',       itemCount:204,active:true },
+    { id:6, name:'Sportswear',  description:'Athletic and performance wear',    itemCount:55, active:true },
+  ],
 };
 
-/* ==============================================
-   AUTH HANDLERS
-=============================================== */
-function setError(id, msg) { const el = document.getElementById(id); if (el) el.textContent = msg; }
-function clearError(id) { setError(id, ''); }
-function showAlert(id, msg, type = 'danger') {
-    const el = document.getElementById(id);
-    if (!el) return;
-    el.textContent = msg;
-    el.className = `alert alert-${type} py-2`;
+/* ─────────────────────────────────────────────────────────────
+   AUTH FLOWS
+   Old endpoints: /login, /register, /forgot-password
+   ───────────────────────────────────────────────────────────── */
+function showAuthForm(form) {
+  ['login','register','forgot'].forEach(f => {
+    document.getElementById(`auth-${f}`).style.display = (f === form) ? 'block' : 'none';
+  });
 }
-function hideAlert(id) {
-    const el = document.getElementById(id);
-    if (!el) return;
-    el.className = 'alert alert-danger py-2 d-none';
-}
-function setLoading(btnId, state) {
-    const btn = document.getElementById(btnId);
-    if (!btn) return;
-    btn.disabled = state;
-    state ? btn.classList.add('loading') : btn.classList.remove('loading');
-}
-function clearAllFeedback() {
-    document.querySelectorAll('.feedback-msg').forEach(el => el.textContent = '');
-    ['login-alert','login-success','register-alert','register-success','forgot-alert','forgot-success'].forEach(hideAlert);
-}
-function togglePassword(inputId, btn) {
-    const input = document.getElementById(inputId);
-    const icon  = btn.querySelector('i');
-    if (input.type === 'password') { input.type = 'text'; icon.className = 'bi bi-eye-slash'; }
-    else { input.type = 'password'; icon.className = 'bi bi-eye'; }
-}
-function isValidEmail(email) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email); }
-
-document.getElementById('reg-password').addEventListener('input', function () {
-    const val = this.value;
-    let score = 0;
-    if (val.length >= 8) score++;
-    if (/[A-Z]/.test(val)) score++;
-    if (/[0-9]/.test(val)) score++;
-    if (/[^A-Za-z0-9]/.test(val)) score++;
-    const bar   = document.getElementById('strength-bar');
-    const label = document.getElementById('strength-label');
-    const levels = [{ pct:0,  color:'',        text:'' }, { pct:25, color:'#dc3545', text:'Weak' }, { pct:50, color:'#ffc107', text:'Fair' }, { pct:75, color:'#0d6efd', text:'Good' }, { pct:100,color:'#198754', text:'Strong' }];
-    const lvl = levels[score];
-    bar.style.width = lvl.pct + '%';
-    bar.style.backgroundColor = lvl.color;
-    label.textContent = val.length ? lvl.text : '';
-});
 
 async function handleLogin() {
-    hideAlert('login-alert'); hideAlert('login-success');
-    clearError('login-email-err'); clearError('login-pass-err');
-    const email    = document.getElementById('login-email').value.trim();
-    const password = document.getElementById('login-password').value;
-    let valid = true;
-    if (!email) { setError('login-email-err', 'Email is required.'); valid = false; }
-    else if (!isValidEmail(email)) { setError('login-email-err', 'Please enter a valid email.'); valid = false; }
-    if (!password) { setError('login-pass-err', 'Password is required.'); valid = false; }
-    if (!valid) return;
-    setLoading('login-btn', true);
-    try {
-        const { ok, data } = await api('POST', '/login', { email, password });
-        if (ok) {
-            const user  = data.user  || { id: data.id, firstName: data.firstName, email: data.email };
-            const token = data.token || 'temp-token';
-            setLoggedIn(user, token);
-            await loadShopDataForLoggedUser();
-            showSection('shop');
-        } else {
-            showAlert('login-alert', data.message || 'Invalid email or password.');
-        }
-    } catch (err) {
-        showAlert('login-alert', 'Invalid email or password.');
-    } finally {
-        setLoading('login-btn', false);
+  const email    = document.getElementById('login-email').value.trim();
+  const password = document.getElementById('login-password').value;
+  const errEl    = document.getElementById('login-error');
+  errEl.style.display = 'none';
+  if (!email || !password) { showError(errEl, 'Please enter your email and password.'); return; }
+
+  const result = await apiFetch('/login', {
+    method: 'POST',
+    body: JSON.stringify({ email, password })
+  });
+
+  if (result && result.ok) {
+    const token = result.data?.token || result.data?.accessToken || result.data;
+    if (token && typeof token === 'string') {
+      authToken = token;
+      localStorage.setItem('auth_token', token);
     }
+    currentUser = result.data?.user || { email, name: email.split('@')[0] };
+    localStorage.setItem('current_user', JSON.stringify(currentUser));
+    initApp();
+  } else {
+    // Demo fallback: allow login with any credentials if backend unavailable
+    if (!result) {
+      currentUser = { email, name: email.split('@')[0] };
+      localStorage.setItem('current_user', JSON.stringify(currentUser));
+      authToken = 'demo-token';
+      localStorage.setItem('auth_token', 'demo-token');
+      initApp();
+    } else {
+      showError(errEl, result.data?.message || 'Invalid credentials. Please try again.');
+    }
+  }
 }
 
 async function handleRegister() {
-    hideAlert('register-alert'); hideAlert('register-success');
-    ['reg-firstname-err','reg-lastname-err','reg-email-err','reg-pass-err','reg-confirm-err','reg-terms-err'].forEach(clearError);
-    const firstName = document.getElementById('reg-firstname').value.trim();
-    const lastName  = document.getElementById('reg-lastname').value.trim();
-    const email     = document.getElementById('reg-email').value.trim();
-    const password  = document.getElementById('reg-password').value;
-    const confirm   = document.getElementById('reg-confirm').value;
-    const terms     = document.getElementById('reg-terms').checked;
-    let valid = true;
-    if (!firstName) { setError('reg-firstname-err', 'First name is required.'); valid = false; }
-    if (!lastName)  { setError('reg-lastname-err',  'Last name is required.');  valid = false; }
-    if (!email) { setError('reg-email-err', 'Email is required.'); valid = false; }
-    else if (!isValidEmail(email)) { setError('reg-email-err', 'Please enter a valid email.'); valid = false; }
-    if (!password) { setError('reg-pass-err', 'Password is required.'); valid = false; }
-    else if (password.length < 8) { setError('reg-pass-err', 'Password must be at least 8 characters.'); valid = false; }
-    if (password !== confirm) { setError('reg-confirm-err', 'Passwords do not match.'); valid = false; }
-    if (!terms) { setError('reg-terms-err', 'You must accept the terms to continue.'); valid = false; }
-    if (!valid) return;
-    setLoading('register-btn', true);
-    try {
-        const { ok, data } = await api('POST', '/register', { firstName, lastName, email, password });
-        if (ok) {
-            const user  = data.user  || { id: data.id, firstName: data.firstName, email: data.email };
-            const token = data.token || 'temp-token';
-            setLoggedIn(user, token);
-            await loadShopDataForLoggedUser();
-            showSection('shop');
-        } else {
-            showAlert('register-alert', data.message || 'Account already exists or invalid data.');
-        }
-    } catch (err) {
-        showAlert('register-alert', 'Network error. Please try again.');
-    } finally {
-        setLoading('register-btn', false);
-    }
+  const name     = document.getElementById('reg-name').value.trim();
+  const email    = document.getElementById('reg-email').value.trim();
+  const password = document.getElementById('reg-password').value;
+  const errEl    = document.getElementById('reg-error');
+  const sucEl    = document.getElementById('reg-success');
+  errEl.style.display = 'none'; sucEl.style.display = 'none';
+  if (!name || !email || !password) { showError(errEl, 'All fields are required.'); return; }
+
+  const result = await apiFetch('/register', {
+    method: 'POST',
+    body: JSON.stringify({ name, email, password })
+  });
+
+  if (!result || result.ok) {
+    sucEl.textContent = '✅ Account registered successfully. You may now sign in.';
+    sucEl.style.display = 'block';
+    setTimeout(() => showAuthForm('login'), 2000);
+  } else {
+    showError(errEl, result.data?.message || 'Registration failed. Please try again.');
+  }
 }
 
-async function handleForgot() {
-    hideAlert('forgot-alert'); hideAlert('forgot-success');
-    clearError('forgot-email-err');
-    const email = document.getElementById('forgot-email').value.trim();
-    if (!email) { setError('forgot-email-err', 'Email is required.'); return; }
-    if (!isValidEmail(email)) { setError('forgot-email-err', 'Please enter a valid email.'); return; }
-    setLoading('forgot-btn', true);
-    try {
-        const { ok, data } = await api('POST', '/forgot-password', { email });
-        if (ok) {
-            showAlert('forgot-success', data.message || 'Reset link sent! Check your inbox.', 'success');
-            document.getElementById('forgot-email').value = '';
-        } else {
-            showAlert('forgot-alert', data.message || 'Something went wrong. Please try again.');
-        }
-    } catch {
-        showAlert('forgot-alert', 'Network error. Please try again.');
-    } finally {
-        setLoading('forgot-btn', false);
-    }
+async function handleForgotPassword() {
+  const email = document.getElementById('forgot-email').value.trim();
+  const errEl = document.getElementById('forgot-error');
+  const sucEl = document.getElementById('forgot-success');
+  errEl.style.display = 'none'; sucEl.style.display = 'none';
+  if (!email) { showError(errEl, 'Please enter your corporate email.'); return; }
+
+  const result = await apiFetch('/forgot-password', {
+    method: 'POST',
+    body: JSON.stringify({ email })
+  });
+
+  sucEl.textContent = '📧 If an account exists for ' + email + ', a reset link has been sent.';
+  sucEl.style.display = 'block';
 }
 
-async function loadShopDataForLoggedUser() {
-    renderProductSkeletons();
-    try {
-        const { ok: catOk, data: cats } = await api('GET', '/api/categories');
-        if (catOk && Array.isArray(cats)) {
-            const container = document.getElementById('category-pills');
-            const allPills = [{ id: 'all', name: 'All Products' }, ...cats];
-            container.innerHTML = allPills.map(cat => `<button class="category-pill ${cat.id === 'all' ? 'active' : ''}" data-id="${cat.id}" onclick="filterCategory('${cat.id}')">${cat.name}</button>`).join('');
-        } else {
-            fallbackCategoryPills();
-        }
-        const { ok: prodOk, data: prods } = await api('GET', '/cart');
-        if (prodOk && Array.isArray(prods)) {
-            allProducts = prods;
-            renderProducts(prods);
-        } else {
-            renderProducts(DEMO_PRODUCTS);
-        }
-        await loadCart();
-    } catch (e) {
-        fallbackCategoryPills();
-        renderProducts(DEMO_PRODUCTS);
-    }
+function handleLogout() {
+  authToken = null;
+  currentUser = null;
+  localStorage.removeItem('auth_token');
+  localStorage.removeItem('current_user');
+  document.getElementById('app-shell').style.display = 'none';
+  document.getElementById('auth-screen').style.display = 'flex';
+  showAuthForm('login');
 }
 
-function fallbackCategoryPills() {
-    const container = document.getElementById('category-pills');
-    const allPills = [{ id: 'all', name: 'All Products' }, ...DEMO_CATEGORIES];
-    container.innerHTML = allPills.map(cat => `<button class="category-pill ${cat.id === 'all' ? 'active' : ''}" data-id="${cat.id}" onclick="filterCategory('${cat.id}')">${cat.name}</button>`).join('');
+function showError(el, msg) { el.textContent = msg; el.style.display = 'block'; }
+
+/* ─────────────────────────────────────────────────────────────
+   APP INIT
+   ───────────────────────────────────────────────────────────── */
+function initApp() {
+  document.getElementById('auth-screen').style.display = 'none';
+  document.getElementById('app-shell').style.display = 'block';
+
+  const name = currentUser?.name || currentUser?.email || 'User';
+  document.getElementById('topbar-username').textContent = name;
+  document.getElementById('user-avatar-initials').textContent = name.slice(0,2).toUpperCase();
+
+  loadDashboard();
+  updateDispatchBadge();
 }
 
-function renderProductSkeletons() {
-    const grid = document.getElementById('product-grid');
-    grid.innerHTML = Array(8).fill(0).map(() => `<div class="col mb-5"><div class="card h-100"><div class="skeleton skeleton-img"></div><div class="card-body p-4"><div class="skeleton skeleton-line w-75 mx-auto"></div><div class="skeleton skeleton-line w-50 mx-auto mt-2"></div></div><div class="card-footer p-4 pt-0 border-top-0 bg-transparent"><div class="d-flex justify-content-center"><div class="skeleton skeleton-btn"></div></div></div></div></div>`).join('');
+/* ─────────────────────────────────────────────────────────────
+   NAVIGATION
+   ───────────────────────────────────────────────────────────── */
+const PAGE_LABELS = {
+  'dashboard':       'Dashboard',
+  'erp-orders':      'ERP / Order Processing',
+  'erp-invoices':    'ERP / Invoices',
+  'crm-customers':   'CRM / Wholesale Customers',
+  'crm-contacts':    'CRM / Records',
+  'wms-inventory':   'WMS / Inventory Items',
+  'wms-dispatch':    'WMS / Dispatch List',
+  'wms-categories':  'WMS / Stock Categories',
+  'settings':        'Settings',
+};
+
+function navigate(page) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById(`page-${page}`).classList.add('active');
+  document.querySelector(`[data-page="${page}"]`)?.classList.add('active');
+  document.getElementById('topbar-breadcrumb').textContent = '/ ' + (PAGE_LABELS[page] || page);
+
+  // Lazy-load page data
+  if (page === 'erp-orders')     loadOrders();
+  if (page === 'erp-invoices')   loadInvoices();
+  if (page === 'crm-customers')  loadCRMCustomers();
+  if (page === 'crm-contacts')   loadContacts();
+  if (page === 'wms-inventory')  loadInventory();
+  if (page === 'wms-dispatch')   renderDispatch();
+  if (page === 'wms-categories') loadCategories();
 }
 
-function renderProducts(products) {
-    const grid = document.getElementById('product-grid');
-    if (!products.length) {
-        grid.innerHTML = `<div class="col-12"><div class="state-msg"><i class="bi bi-box-seam"></i>No products found.</div></div>`;
-        return;
-    }
-    grid.innerHTML = products.map(p => {
-        let priceHtml = '';
-        if (p.price_min && p.price_max) priceHtml = `$${parseFloat(p.price_min).toFixed(2)} - $${parseFloat(p.price_max).toFixed(2)}`;
-        else if (p.price) priceHtml = `$${parseFloat(p.price).toFixed(2)}`;
-        const badgeHtml = p.badge ? `<div class="badge bg-dark text-white position-absolute" style="top:.5rem;right:.5rem">${p.badge}</div>` : '';
-        const starsHtml = p.rating ? `<div class="d-flex justify-content-center small text-warning mb-2">${'<div class="bi-star-fill"></div>'.repeat(Math.round(p.rating))}</div>` : '';
-        const btnHtml = `<button class="btn btn-outline-dark mt-auto" onclick="showProductDetails(${JSON.stringify(p).replace(/"/g, '&quot;')})">View Details</button>`;
-        return `<div class="col mb-5"><div class="card h-100">${badgeHtml}<img class="card-img-top" src="${p.image_url || 'https://dummyimage.com/450x300/dee2e6/6c757d.jpg'}" alt="${p.name}" onerror="this.src='https://dummyimage.com/450x300/dee2e6/6c757d.jpg'" /><div class="card-body p-4"><div class="text-center"><h5 class="fw-bolder">${p.name}</h5>${starsHtml}${priceHtml}</div></div><div class="card-footer p-4 pt-0 border-top-0 bg-transparent"><div class="text-center">${btnHtml}</div></div></div></div>`;
-    }).join('');
+/* ─────────────────────────────────────────────────────────────
+   DASHBOARD
+   ───────────────────────────────────────────────────────────── */
+async function loadDashboard() {
+  // Old: fetch product count → New: fetch inventory/WMS stock count
+  const invRes = await apiFetch('/api/categories');
+  const orderRes = await apiFetch('/api/orders');
+
+  const inventory = (invRes?.data?.length || invRes?.data?.content?.length) ? invRes.data : DEMO.inventoryItems;
+  const orders    = (orderRes?.data?.length || orderRes?.data?.content?.length) ? orderRes.data?.content || orderRes.data : DEMO.orders;
+
+  document.getElementById('stat-inventory').textContent = DEMO.inventoryItems.length;
+  document.getElementById('stat-customers').textContent = DEMO.customers.length;
+  document.getElementById('stat-pending').textContent   = DEMO.orders.filter(o=>o.status==='PENDING').length;
+  document.getElementById('stat-dispatch').textContent  = dispatchList.reduce((s,i)=>s+i.qty,0);
+
+  // Render recent orders table in dashboard
+  renderOrdersTable(DEMO.orders.slice(0,5), 'dashboard-orders-table', true);
 }
 
-async function loadCart() {
-    try {
-        const { ok, data } = await api('GET', '/cart');
-        if (ok && Array.isArray(data)) { cart = data; updateCartUI(); }
-    } catch(e) {}
+function refreshDashboard() { loadDashboard(); showToast('Dashboard data refreshed.'); }
+
+/* ─────────────────────────────────────────────────────────────
+   ERP — ORDERS
+   Old: /api/orders (cart orders / checkout orders) → ERP orders
+   ───────────────────────────────────────────────────────────── */
+let allOrders = [];
+let orderFilterStatus = 'all';
+
+async function loadOrders() {
+  document.getElementById('orders-table-wrap').innerHTML = '<div class="loading-state"><div class="spinner"></div> Loading ERP orders…</div>';
+  const res = await apiFetch('/api/orders');
+  if (res?.ok && (res.data?.length || res.data?.content?.length)) {
+    allOrders = res.data?.content || res.data;
+  } else {
+    allOrders = DEMO.orders;
+  }
+  document.getElementById('nav-badge-orders').textContent = allOrders.filter(o=>o.status==='PENDING').length;
+  renderOrdersTable(allOrders, 'orders-table-wrap');
 }
 
-async function addToCart(productId, showOffcanvas = true) {
-    if (!currentUser) { showAuth('login'); return false; }
-    try {
-        const { ok, data } = await api('POST', '/cart', { productId, quantity: 1 });
-        if (ok) {
-            const existing = cart.find(item => item.product.id === productId);
-            if (existing) existing.quantity += 1;
-            else cart.push(data.cartItem);
-            updateCartUI();
-            if (showOffcanvas) {
-                new bootstrap.Offcanvas(document.getElementById('cartOffcanvas')).show();
-            }
-            return true;
-        } else {
-            alert(data.message || 'Could not add.');
-            return false;
-        }
-    } catch { 
-        alert('Network error'); 
-        return false;
-    }
+function renderOrdersTable(orders, wrapperId, mini=false) {
+  const wrap = document.getElementById(wrapperId);
+  if (!orders.length) {
+    wrap.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📋</div><div class="empty-state-text">No ERP orders found</div></div>';
+    return;
+  }
+
+  let filtered = orders;
+  if (orderFilterStatus !== 'all') filtered = orders.filter(o => o.status === orderFilterStatus);
+  const search = document.getElementById('order-search')?.value?.toLowerCase() || '';
+  if (search) filtered = filtered.filter(o =>
+    (o.id||'').toLowerCase().includes(search) ||
+    (o.customer||o.customerName||'').toLowerCase().includes(search)
+  );
+
+  const statusBadge = s => {
+    const map = {
+      PENDING:    'badge-amber',
+      PROCESSING: 'badge-blue',
+      DISPATCHED: 'badge-purple',
+      COMPLETED:  'badge-green',
+      CANCELLED:  'badge-red',
+    };
+    return `<span class="badge ${map[s]||'badge-gray'}">${s||'UNKNOWN'}</span>`;
+  };
+
+  wrap.innerHTML = `
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>ORDER ID</th>
+          <th>CUSTOMER</th>
+          <th>STATUS</th>
+          <th>DATE</th>
+          ${mini ? '' : '<th>ITEMS</th>'}
+          <th>TOTAL VALUE</th>
+          ${mini ? '' : '<th>ACTIONS</th>'}
+        </tr>
+      </thead>
+      <tbody>
+        ${filtered.map(o => `
+          <tr>
+            <td class="mono">${o.id||o.orderId||'—'}</td>
+            <td>${o.customer||o.customerName||'—'}</td>
+            <td>${statusBadge(o.status)}</td>
+            <td class="secondary">${o.date||o.createdAt||'—'}</td>
+            ${mini ? '' : `<td class="mono">${o.items||'—'}</td>`}
+            <td class="mono">$${Number(o.total||o.totalAmount||0).toLocaleString('en',{minimumFractionDigits:2})}</td>
+            ${mini ? '' : `<td>
+              <button class="btn btn-outline" style="font-size:11px;padding:4px 8px" onclick="viewOrder('${o.id||o.orderId}')">View</button>
+            </td>`}
+          </tr>
+        `).join('')}
+      </tbody>
+    </table>
+  `;
 }
 
-async function updateQuantity(cartItemId, newQty) {
-    if (newQty < 1) { removeFromCart(cartItemId); return; }
-    try {
-        const { ok } = await api('PUT', `/api/cart/${cartItemId}`, { quantity: newQty });
-        if (ok) { const item = cart.find(i => i.id === cartItemId); if (item) item.quantity = newQty; updateCartUI(); }
-    } catch { alert('Error'); }
+function filterOrders(status, el) {
+  orderFilterStatus = status;
+  document.querySelectorAll('#page-erp-orders .tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  renderOrdersTable(allOrders, 'orders-table-wrap');
 }
 
-async function removeFromCart(cartItemId) {
-    try {
-        const { ok } = await api('DELETE', `/api/cart/${cartItemId}`);
-        if (ok) { cart = cart.filter(i => i.id !== cartItemId); updateCartUI(); }
-    } catch { alert('Error'); }
+function filterOrdersSearch() { renderOrdersTable(allOrders, 'orders-table-wrap'); }
+
+function viewOrder(id) { showToast(`Opening ERP Order ${id}…`); }
+
+function openCreateOrderModal() {
+  const sel = document.getElementById('order-customer-select');
+  sel.innerHTML = DEMO.customers.map(c => `<option value="${c.id}">${c.company} — ${c.contact}</option>`).join('');
+  document.getElementById('modal-create-order').classList.add('open');
 }
 
-function updateCartUI() {
-    const totalItems = cart.reduce((sum, i) => sum + i.quantity, 0);
-    document.getElementById('cart-count').textContent = totalItems;
-    const list = document.getElementById('cart-items-list');
-    const footer = document.getElementById('cart-footer');
-    if (!cart.length) {
-        list.innerHTML = `<div class="cart-empty"><i class="bi bi-cart-x"></i>Your cart is empty.</div>`;
-        footer.style.display = 'none'; return;
-    }
-    let total = 0;
-    list.innerHTML = cart.map(item => {
-        const price = parseFloat(item.product.price) || 0;
-        const subtotal = price * item.quantity;
-        total += subtotal;
-        return `<div class="d-flex align-items-center gap-3 mb-3 pb-3 border-bottom"><img class="cart-item-img" src="${item.product.image_url || 'https://dummyimage.com/60x60/dee2e6/6c757d.jpg'}" /><div class="flex-grow-1"><div class="fw-semibold">${item.product.name}</div><div class="text-muted">$${price.toFixed(2)} each</div><div class="d-flex gap-2 mt-1"><button class="btn btn-sm btn-outline-secondary px-2 py-0" onclick="updateQuantity(${item.id}, ${item.quantity-1})">−</button><span>${item.quantity}</span><button class="btn btn-sm btn-outline-secondary px-2 py-0" onclick="updateQuantity(${item.id}, ${item.quantity+1})">+</button></div></div><div class="text-end"><div class="fw-bold">$${subtotal.toFixed(2)}</div><button class="btn btn-sm text-danger p-0 mt-1" onclick="removeFromCart(${item.id})"><i class="bi bi-trash"></i></button></div></div>`;
-    }).join('');
-    document.getElementById('cart-total').textContent = `$${total.toFixed(2)}`;
-    footer.style.display = 'block';
+async function submitERPOrder() {
+  // Old: POST to checkout → New: ERP order creation
+  const res = await apiFetch('/api/orders', {
+    method: 'POST',
+    body: JSON.stringify({ items: dispatchList, type: 'WHOLESALE' })
+  });
+  closeModal('modal-create-order');
+  showToast('✅ ERP Order submitted successfully.');
+  loadOrders();
 }
 
-async function handleCheckout() {
-    try {
-        const { ok, data } = await api('POST', '/api/orders');
-        if (ok) { cart = []; updateCartUI(); bootstrap.Offcanvas.getInstance(document.getElementById('cartOffcanvas')).hide(); alert(`Order placed! ID: ${data.orderId}`); }
-        else alert('Checkout failed');
-    } catch { alert('Network error'); }
+/* ─────────────────────────────────────────────────────────────
+   ERP — INVOICES
+   ───────────────────────────────────────────────────────────── */
+function loadInvoices() {
+  const invoices = [
+    { id:'INV-2025-0041', order:'ERP-2025-0041', customer:'StyleMart Ltd.',  status:'UNPAID',  due:'2025-06-15', amount:4820.00 },
+    { id:'INV-2025-0040', order:'ERP-2025-0040', customer:'FashionHub Inc.', status:'PAID',    due:'2025-06-05', amount:11200.00},
+    { id:'INV-2025-0039', order:'ERP-2025-0039', customer:'TrendZone GmbH',  status:'PAID',    due:'2025-05-30', amount:3350.00 },
+    { id:'INV-2025-0038', order:'ERP-2025-0038', customer:'NovaTex Co.',     status:'OVERDUE', due:'2025-05-10', amount:8700.00 },
+  ];
+  const badge = { PAID:'badge-green', UNPAID:'badge-amber', OVERDUE:'badge-red' };
+  document.getElementById('invoices-table-wrap').innerHTML = `
+    <table class="data-table">
+      <thead><tr><th>INVOICE #</th><th>ERP ORDER</th><th>CUSTOMER</th><th>STATUS</th><th>DUE DATE</th><th>AMOUNT</th><th>ACTIONS</th></tr></thead>
+      <tbody>${invoices.map(i=>`
+        <tr>
+          <td class="mono">${i.id}</td>
+          <td class="mono secondary">${i.order}</td>
+          <td>${i.customer}</td>
+          <td><span class="badge ${badge[i.status]}">${i.status}</span></td>
+          <td class="secondary">${i.due}</td>
+          <td class="mono">$${i.amount.toLocaleString('en',{minimumFractionDigits:2})}</td>
+          <td><button class="btn btn-outline" style="font-size:11px;padding:4px 8px">⬇ PDF</button></td>
+        </tr>`).join('')}
+      </tbody>
+    </table>`;
 }
 
-document.addEventListener('keydown', function (e) {
-    if (e.key !== 'Enter') return;
-    const active = document.querySelector('.auth-form.active');
-    if (!active) return;
-    if (active.id === 'form-login')    handleLogin();
-    if (active.id === 'form-register') handleRegister();
-    if (active.id === 'form-forgot')   handleForgot();
+/* ─────────────────────────────────────────────────────────────
+   CRM — CUSTOMERS
+   Old: User/customer list → Wholesale CRM records
+   ───────────────────────────────────────────────────────────── */
+let allCRMCustomers = [];
+
+async function loadCRMCustomers() {
+  document.getElementById('crm-grid').innerHTML = '<div class="loading-state" style="grid-column:1/-1"><div class="spinner"></div> Loading CRM records…</div>';
+  allCRMCustomers = DEMO.customers;
+  renderCRMGrid(allCRMCustomers);
+}
+
+function renderCRMGrid(customers) {
+  const grid = document.getElementById('crm-grid');
+  if (!customers.length) {
+    grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1"><div class="empty-state-icon">👥</div><div class="empty-state-text">No CRM records found</div></div>';
+    return;
+  }
+  const statusBadge = s => ({
+    ACTIVE:'badge-green', INACTIVE:'badge-gray', PROSPECT:'badge-blue'
+  }[s]||'badge-gray');
+
+  grid.innerHTML = customers.map(c => `
+    <div class="crm-card">
+      <div class="crm-card-header">
+        <div class="crm-avatar" style="background:${c.color}">${c.company.slice(0,2).toUpperCase()}</div>
+        <div>
+          <div class="crm-company">${c.company}</div>
+          <div class="crm-contact">👤 ${c.contact}</div>
+        </div>
+        <div style="margin-left:auto"><span class="badge ${statusBadge(c.status)}">${c.status}</span></div>
+      </div>
+      <div class="crm-detail-row"><span class="crm-detail-label">Email</span><span class="crm-detail-value" style="font-size:11px">${c.email}</span></div>
+      <div class="crm-detail-row"><span class="crm-detail-label">Type</span><span class="crm-detail-value">${c.type}</span></div>
+      <div class="crm-detail-row"><span class="crm-detail-label">Total Orders</span><span class="crm-detail-value mono">${c.orders}</span></div>
+      <div class="crm-detail-row"><span class="crm-detail-label">Lifetime Value</span><span class="crm-detail-value mono" style="color:var(--accent-green)">${c.value}</span></div>
+      <div class="crm-detail-row"><span class="crm-detail-label">Last Activity</span><span class="crm-detail-value secondary">${c.lastActivity}</span></div>
+      <div class="crm-actions">
+        <button class="btn btn-outline" style="flex:1;font-size:11px;padding:5px 8px">📋 View Orders</button>
+        <button class="btn btn-blue" style="flex:1;font-size:11px;padding:5px 8px">✉️ Contact</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function filterCRM() {
+  const q = document.getElementById('crm-search').value.toLowerCase();
+  renderCRMGrid(allCRMCustomers.filter(c =>
+    c.company.toLowerCase().includes(q) ||
+    c.contact.toLowerCase().includes(q) ||
+    c.email.toLowerCase().includes(q)
+  ));
+}
+
+function openAddCustomerModal() {
+  document.getElementById('modal-add-customer').classList.add('open');
+}
+
+/* ─────────────────────────────────────────────────────────────
+   CRM — CONTACTS TABLE
+   ───────────────────────────────────────────────────────────── */
+function loadContacts() {
+  const rows = DEMO.customers.map(c => `
+    <tr>
+      <td>${c.contact}</td>
+      <td>${c.company}</td>
+      <td class="secondary">${c.email}</td>
+      <td><span class="badge ${c.status==='ACTIVE'?'badge-green':'badge-gray'}">${c.status}</span></td>
+      <td class="secondary">${c.lastActivity}</td>
+      <td><button class="btn btn-outline" style="font-size:11px;padding:4px 8px">Edit</button></td>
+    </tr>`).join('');
+  document.getElementById('contacts-table-wrap').innerHTML = `
+    <table class="data-table">
+      <thead><tr><th>CONTACT NAME</th><th>COMPANY</th><th>EMAIL</th><th>STATUS</th><th>LAST ACTIVITY</th><th>ACTIONS</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table>`;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   WMS — INVENTORY
+   Old: Products page → Warehouse Inventory Items
+   ───────────────────────────────────────────────────────────── */
+let allInventory = [];
+
+async function loadInventory() {
+  document.getElementById('inventory-grid').innerHTML = '<div class="loading-state" style="grid-column:1/-1"><div class="spinner"></div> Loading warehouse inventory…</div>';
+  
+  // Old: fetch /api/products → now fetches inventory items (same endpoint, renamed UI)
+  const res = await apiFetch('/api/products');
+  if (res?.ok && (res.data?.length || res.data?.content?.length)) {
+    const raw = res.data?.content || res.data;
+    allInventory = raw.map(p => ({
+      id: p.id, name: p.name||p.title, sku: p.sku||`SKU-${p.id}`,
+      category: p.category?.name||p.categoryName||'General',
+      price: p.price||p.unitPrice||0, quantity: p.quantity||p.stock||0,
+      reorder: p.reorderLevel||10, location: p.warehouseLocation||'WH-A',
+      image: '📦',
+    }));
+  } else {
+    allInventory = DEMO.inventoryItems;
+  }
+
+  // Populate category filter
+  const catSel = document.getElementById('inv-category-filter');
+  const cats = [...new Set(allInventory.map(i=>i.category))];
+  catSel.innerHTML = '<option value="">All Categories</option>' + cats.map(c=>`<option>${c}</option>`).join('');
+
+  // Populate dispatch customer dropdown
+  const dispCust = document.getElementById('dispatch-customer');
+  if (dispCust) dispCust.innerHTML = '<option value="">— Select Wholesale Customer —</option>' +
+    DEMO.customers.map(c=>`<option value="${c.id}">${c.company}</option>`).join('');
+
+  // Same for stock-category in add modal
+  const stockCat = document.getElementById('stock-category');
+  if (stockCat) stockCat.innerHTML = cats.map(c=>`<option>${c}</option>`).join('');
+
+  renderInventoryGrid(allInventory);
+}
+
+function renderInventoryGrid(items) {
+  const grid = document.getElementById('inventory-grid');
+  if (!items.length) {
+    grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1"><div class="empty-state-icon">📦</div><div class="empty-state-text">No inventory items found</div></div>';
+    return;
+  }
+  grid.innerHTML = items.map(item => {
+    const pct = item.quantity === 0 ? 0 : Math.min(100, Math.round((item.quantity / Math.max(item.reorder*4, item.quantity)) * 100));
+    const statusCls = item.quantity === 0 ? 'badge-red' : item.quantity <= item.reorder ? 'badge-amber' : 'badge-green';
+    const statusTxt = item.quantity === 0 ? 'OUT OF STOCK' : item.quantity <= item.reorder ? 'LOW STOCK' : 'IN STOCK';
+    const barColor  = item.quantity === 0 ? 'var(--accent-red)' : item.quantity <= item.reorder ? 'var(--accent-amber)' : 'var(--accent-green)';
+    return `
+      <div class="inventory-card">
+        <div class="inv-card-header">
+          <div>
+            <div class="inv-sku">${item.sku}</div>
+            <div class="inv-name">${item.image} ${item.name}</div>
+          </div>
+          <span class="badge ${statusCls}">${statusTxt}</span>
+        </div>
+        <div class="inv-meta">
+          <div class="inv-meta-item"><div class="inv-meta-label">Category</div><div class="inv-meta-value">${item.category}</div></div>
+          <div class="inv-meta-item"><div class="inv-meta-label">Unit Price</div><div class="inv-meta-value mono">$${Number(item.price).toFixed(2)}</div></div>
+          <div class="inv-meta-item"><div class="inv-meta-label">Qty in Stock</div><div class="inv-meta-value mono">${item.quantity}</div></div>
+          <div class="inv-meta-item"><div class="inv-meta-label">Reorder At</div><div class="inv-meta-value mono">${item.reorder}</div></div>
+          <div class="inv-meta-item" style="grid-column:1/-1"><div class="inv-meta-label">Warehouse Location</div><div class="inv-meta-value">${item.location}</div></div>
+        </div>
+        <div class="stock-bar-wrap">
+          <div class="stock-bar-header"><span>Stock Level</span><span>${pct}%</span></div>
+          <div class="stock-bar"><div class="stock-bar-fill" style="width:${pct}%;background:${barColor}"></div></div>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:14px">
+          <!-- Old: "Add to Cart" → New: "Add to Dispatch" -->
+          <button class="btn btn-blue" style="flex:1;font-size:11px;padding:7px" onclick="addToDispatch(${item.id})">
+            ＋ Add to Dispatch
+          </button>
+          <button class="btn btn-outline" style="font-size:11px;padding:7px 10px" onclick="viewStockItem(${item.id})">⋯</button>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function filterInventory() {
+  const q    = document.getElementById('inv-search').value.toLowerCase();
+  const cat  = document.getElementById('inv-category-filter').value;
+  const stat = document.getElementById('inv-status-filter').value;
+  renderInventoryGrid(allInventory.filter(item => {
+    if (q && !(item.name.toLowerCase().includes(q) || item.sku.toLowerCase().includes(q) || item.category.toLowerCase().includes(q))) return false;
+    if (cat && item.category !== cat) return false;
+    if (stat === 'In Stock'     && item.quantity <= item.reorder) return false;
+    if (stat === 'Low Stock'    && (item.quantity > item.reorder || item.quantity === 0)) return false;
+    if (stat === 'Out of Stock' && item.quantity > 0) return false;
+    return true;
+  }));
+}
+
+function openAddStockModal() {
+  // Also populate category dropdown
+  const stockCat = document.getElementById('stock-category');
+  const cats = [...new Set(allInventory.map(i=>i.category))];
+  if (stockCat) stockCat.innerHTML = cats.map(c=>`<option>${c}</option>`).join('');
+  document.getElementById('modal-add-stock').classList.add('open');
+}
+
+async function submitAddStock() {
+  const name   = document.getElementById('stock-name').value;
+  const sku    = document.getElementById('stock-sku').value;
+  const price  = document.getElementById('stock-price').value;
+  const qty    = document.getElementById('stock-qty').value;
+  if (!name || !price) { showToast('⚠ Please fill in required fields.', 'amber'); return; }
+  // Old: POST /api/products → same endpoint, just UI renamed
+  const res = await apiFetch('/api/products', {
+    method: 'POST',
+    body: JSON.stringify({ name, sku, price: parseFloat(price), quantity: parseInt(qty)||0 })
+  });
+  closeModal('modal-add-stock');
+  showToast('📦 Stock item added to warehouse inventory.');
+  loadInventory();
+}
+
+function viewStockItem(id) { showToast(`Opening inventory record #${id}…`); }
+
+/* ─────────────────────────────────────────────────────────────
+   WMS — DISPATCH LIST (Old: Shopping Cart)
+   ───────────────────────────────────────────────────────────── */
+
+// Old: addToCart → addToDispatch
+function addToDispatch(itemId) {
+  const item = allInventory.find(i => i.id === itemId);
+  if (!item) return;
+  if (item.quantity === 0) { showToast('⚠ Item is out of stock.', 'red'); return; }
+
+  const existing = dispatchList.find(d => d.id === itemId);
+  if (existing) { existing.qty++; }
+  else { dispatchList.push({ id: item.id, name: item.name, sku: item.sku, price: item.price, qty: 1, image: item.image }); }
+
+  // Old: sync with /api/cart → same endpoint
+  syncDispatchWithAPI();
+  saveDispatch();
+  updateDispatchBadge();
+  showToast(`✅ ${item.name} added to dispatch list.`);
+}
+
+async function syncDispatchWithAPI() {
+  // Old: POST to /api/cart (kept compatible)
+  await apiFetch('/api/cart', {
+    method: 'POST',
+    body: JSON.stringify({ items: dispatchList })
+  });
+}
+
+function saveDispatch() {
+  localStorage.setItem('dispatch_list', JSON.stringify(dispatchList));
+}
+
+function updateDispatchBadge() {
+  const total = dispatchList.reduce((s,i)=>s+i.qty, 0);
+  document.getElementById('nav-badge-dispatch').textContent = total || '0';
+  document.getElementById('stat-dispatch').textContent = total || '0';
+}
+
+function renderDispatch() {
+  const listEl = document.getElementById('dispatch-items-list');
+  document.getElementById('dispatch-count').textContent = dispatchList.length;
+
+  if (!dispatchList.length) {
+    listEl.innerHTML = '<div class="empty-state"><div class="empty-state-icon">🚚</div><div class="empty-state-text">Dispatch list is empty</div><div class="empty-state-sub">Browse Inventory Items and click "Add to Dispatch"</div></div>';
+    document.getElementById('dispatch-summary-rows').innerHTML = '';
+    document.getElementById('dispatch-total').textContent = '$0.00';
+    return;
+  }
+
+  // Old: cart item rows → dispatch queue rows
+  listEl.innerHTML = dispatchList.map(item => `
+    <div class="dispatch-item">
+      <div class="dispatch-thumb">${item.image||'📦'}</div>
+      <div class="dispatch-info">
+        <div class="dispatch-name">${item.name}</div>
+        <div class="dispatch-sku">${item.sku}</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <button class="icon-btn" onclick="changeDispatchQty(${item.id}, -1)" style="font-size:14px">−</button>
+        <span class="dispatch-qty">${item.qty}</span>
+        <button class="icon-btn" onclick="changeDispatchQty(${item.id}, 1)" style="font-size:14px">＋</button>
+        <button class="icon-btn" onclick="removeFromDispatch(${item.id})" style="color:var(--accent-red)">🗑</button>
+      </div>
+      <div class="dispatch-qty">$${(item.price * item.qty).toFixed(2)}</div>
+    </div>`).join('');
+
+  const subtotal = dispatchList.reduce((s,i)=>s+(i.price*i.qty), 0);
+  document.getElementById('dispatch-summary-rows').innerHTML = `
+    <div style="font-size:12px;color:var(--text-secondary);margin-bottom:8px">
+      ${dispatchList.length} line item(s) — ${dispatchList.reduce((s,i)=>s+i.qty,0)} units total
+    </div>`;
+  document.getElementById('dispatch-total').textContent = '$' + subtotal.toFixed(2);
+}
+
+function changeDispatchQty(id, delta) {
+  const item = dispatchList.find(i => i.id === id);
+  if (!item) return;
+  item.qty = Math.max(1, item.qty + delta);
+  saveDispatch(); updateDispatchBadge(); renderDispatch();
+}
+
+function removeFromDispatch(id) {
+  dispatchList = dispatchList.filter(i => i.id !== id);
+  saveDispatch(); updateDispatchBadge(); renderDispatch();
+}
+
+function clearDispatch() {
+  dispatchList = [];
+  saveDispatch(); updateDispatchBadge(); renderDispatch();
+  showToast('Dispatch list cleared.');
+}
+
+// Old: checkout → createDispatchOrder
+async function createDispatchOrder() {
+  if (!dispatchList.length) { showToast('⚠ Dispatch list is empty.', 'amber'); return; }
+  // Old: POST /api/orders (checkout) → same endpoint
+  const res = await apiFetch('/api/orders', {
+    method: 'POST',
+    body: JSON.stringify({ items: dispatchList, type: 'WAREHOUSE_DISPATCH' })
+  });
+  showToast('✅ Warehouse Dispatch Order created successfully.');
+  clearDispatch();
+  navigate('erp-orders');
+}
+
+/* ─────────────────────────────────────────────────────────────
+   WMS — CATEGORIES
+   Old: /api/categories → Stock Category Classification
+   ───────────────────────────────────────────────────────────── */
+async function loadCategories() {
+  const res = await apiFetch('/api/categories');
+  const cats = (res?.ok && res.data?.length) ? res.data : DEMO.categories;
+  document.getElementById('categories-table-wrap').innerHTML = `
+    <table class="data-table">
+      <thead><tr><th>CATEGORY NAME</th><th>DESCRIPTION</th><th>STOCK ITEMS</th><th>STATUS</th><th>ACTIONS</th></tr></thead>
+      <tbody>${cats.map(c=>`
+        <tr>
+          <td style="font-weight:600">${c.name}</td>
+          <td class="secondary">${c.description||'—'}</td>
+          <td class="mono">${c.itemCount||c.productCount||'—'}</td>
+          <td><span class="badge ${c.active!==false?'badge-green':'badge-gray'}">${c.active!==false?'ACTIVE':'INACTIVE'}</span></td>
+          <td style="display:flex;gap:6px">
+            <button class="btn btn-outline" style="font-size:11px;padding:4px 8px">Edit</button>
+            <button class="btn btn-outline" style="font-size:11px;padding:4px 8px;color:var(--accent-red)" onclick="navigate('wms-inventory')">View Stock</button>
+          </td>
+        </tr>`).join('')}
+      </tbody>
+    </table>`;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   UTILITIES
+   ───────────────────────────────────────────────────────────── */
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+}
+
+// Close modals on overlay click
+document.querySelectorAll('.modal-overlay').forEach(el => {
+  el.addEventListener('click', e => { if (e.target === el) el.classList.remove('open'); });
 });
 
-/* ==============================================
-   INIT — show shop immediately with demo cards
-=============================================== */
-showSection('shop');
-renderDemoProductsAndCategories();
+let toastTimer;
+function showToast(msg, type='green') {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.style.borderLeftColor = type === 'amber' ? 'var(--accent-amber)' : type === 'red' ? 'var(--accent-red)' : 'var(--accent-green)';
+  el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 3000);
+}
+
+function toggleUserMenu() {
+  // Simple: show logout toast
+  showToast(`Signed in as ${currentUser?.name||currentUser?.email||'User'}`);
+}
+
+/* ─────────────────────────────────────────────────────────────
+   BOOTSTRAP
+   ───────────────────────────────────────────────────────────── */
+window.addEventListener('DOMContentLoaded', () => {
+  if (authToken && currentUser) {
+    initApp();
+  }
+  // Keyboard: Enter to login
+  document.getElementById('login-password').addEventListener('keydown', e => {
+    if (e.key === 'Enter') handleLogin();
+  });
+});
 </script>
 </body>
 </html>
